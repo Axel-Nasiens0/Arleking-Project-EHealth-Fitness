@@ -1,0 +1,112 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="custom-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/folder" text="" icon="chevron-back-outline"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="app-title">ARLEKING</ion-title>
+    <ion-buttons slot="end">
+      <button class="icon-btn">
+        <ion-icon name="ellipsis-horizontal-sharp"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="pasos-detalle-content">
+  <!-- 1. Barra Superior con Días de la Semana y Lanzitas -->
+  <div class="calendar-bar">
+    <div *ngFor="let item of diasSemana" class="day-chip">
+      <span class="day-label">{{ item.dia }}</span>
+      <div class="mini-lance-wrapper">
+        <svg class="mini-lance-svg" viewBox="0 0 100 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="43" y="130" width="14" height="90" [attr.stroke]="item.goal ? '#D4AF37' : '#7E57C2'" stroke-width="6" fill="#ffffff"/>
+          <path d="M 50 70 Q 65 95 85 105 Q 65 115 50 140 Q 35 115 15 105 Q 35 95 50 70 Z" [attr.stroke]="item.goal ? '#D4AF37' : '#E91E63'" stroke-width="6" fill="#ffffff"/>
+          <circle cx="50" cy="105" r="8.5" [attr.fill]="item.goal ? '#D4AF37' : '#1A1A1A'"/>
+          <path d="M 50 15 L 75 45 L 75 80 L 25 80 L 25 45 Z" [attr.stroke]="item.goal ? '#D4AF37' : '#26C6DA'" stroke-width="6" fill="#ffffff"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Tarjeta Principal: Lanza de Arleking y Métricas -->
+  <div class="card-container lance-main-card" [class.golden-goal]="esGoalAlcanzado">
+    <!-- Visualización exacta del SVG de la Lanza del Dashboard -->
+    <div class="lance-wrapper">
+      <svg class="arleking-sword-svg" viewBox="0 0 100 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="43" y="130" width="14" height="90" class="sword-handle" />
+        <path d="M 50 70 Q 65 95 85 105 Q 65 115 50 140 Q 35 115 15 105 Q 35 95 50 70 Z" class="sword-guard" />
+        <circle cx="50" cy="105" r="8.5" class="sword-gem" />
+        <path d="M 50 15 L 75 45 L 75 80 L 25 80 L 25 45 Z" class="sword-blade" />
+      </svg>
+    </div>
+
+    <!-- Lista de Métricas (Pasos, Calorías, Tiempo) y Distancia -->
+    <div class="metrics-list">
+      <div class="metric-item">
+        <div class="icon-shape cyan-gem"></div>
+        <div class="metric-info">
+          <span class="metric-title">Pasos</span>
+          <div class="metric-values">
+            <span class="val-current">{{ pasosActuales | number }}</span>
+            <span class="val-target">{{ pasosMeta | number }} pasos</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-item">
+        <div class="icon-shape pink-star"></div>
+        <div class="metric-info">
+          <span class="metric-title">Calorías</span>
+          <div class="metric-values">
+            <span class="val-current">{{ caloriasActuales }}</span>
+            <span class="val-target">{{ caloriasMeta }} cal</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-item">
+        <div class="icon-shape purple-bar"></div>
+        <div class="metric-info">
+          <span class="metric-title">Tiempo</span>
+          <div class="metric-values">
+            <span class="val-current">{{ tiempoActual }}</span>
+            <span class="val-target">{{ tiempoMeta }} mins</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="distance-footer">
+        <span class="dist-text">Total de distancia recorrida</span>
+        <span class="dots">...........................................</span>
+        <span class="dist-val">{{ distanciaRecorrida }} km</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Gráfico de Barras de Distribución Horaria -->
+  <div class="card-container chart-card">
+    <h3 class="card-title">Pasos</h3>
+    
+    <!-- Leyenda de Colores de Horarios -->
+    <div class="chart-legend">
+      <span class="legend-dot dot-yellow">06:00</span>
+      <span class="legend-dot dot-beige">10:00</span>
+      <span class="legend-dot dot-brown">02:00</span>
+      <span class="legend-dot dot-green">12:00</span>
+    </div>
+
+    <div class="bar-chart">
+      <div *ngFor="let item of distribucionHorarios" class="bar-group">
+        <span class="bar-value">{{ item.pasos }}</span>
+        <div class="bar-wrapper">
+          <div class="bar-fill" [style.height.%]="(item.pasos / 3500) * 100" [ngClass]="item.colorClass"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Contenedor de Mapa Real (Leaflet) -->
+  <div class="card-container map-card">
+    <div id="real-leaflet-map"></div>
+  </div>
+</ion-content>

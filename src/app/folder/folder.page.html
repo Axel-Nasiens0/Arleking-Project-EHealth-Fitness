@@ -1,0 +1,78 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="main-toolbar">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title class="app-title">ARLEKING</ion-title>
+    <ion-buttons slot="end">
+      <button class="icon-btn">
+        <ion-icon name="ellipsis-vertical"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="dashboard-content">
+  <!-- Tarjeta Principal de la Lanza -->
+  <div class="card-container sword-main-card" (click)="irADetallePasos()" [class.golden-goal]="esGoalAlcanzado">
+    <div class="sword-legend">
+      <div class="legend-row">
+        <span class="dot cyan"></span>
+        <span><b>{{ pasosActuales | number }}</b> Pasos</span>
+      </div>
+      <div class="legend-row">
+        <span class="dot pink"></span>
+        <span><b>{{ caloriasActuales }}</b> Calorías</span>
+      </div>
+      <div class="legend-row">
+        <span class="dot purple"></span>
+        <span><b>{{ tiempoMins }}</b> mins</span>
+      </div>
+    </div>
+
+    <div class="sword-wrapper">
+      <svg class="arleking-sword-svg" viewBox="0 0 100 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="43" y="130" width="14" height="90" class="sword-handle" />
+        <path d="M 50 70 Q 65 95 85 105 Q 65 115 50 140 Q 35 115 15 105 Q 35 95 50 70 Z" class="sword-guard" />
+        <circle cx="50" cy="105" r="8.5" class="sword-gem" />
+        <path d="M 50 15 L 75 45 L 75 80 L 25 80 L 25 45 Z" class="sword-blade" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Contenedor Vertical de Widgets -->
+  <div class="cards-stack">
+    <!-- Tarjeta de Progreso de Pasos -->
+    <div class="card-container widget-card">
+      <div class="widget-info">
+        <span class="widget-title"><b>{{ pasosActuales | number }}</b></span>
+        <span class="widget-subtitle">/{{ pasosMeta | number }} Pasos</span>
+      </div>
+      <div class="steps-progress-bar">
+        <div class="progress-fill" [style.width.%]="(pasosActuales / pasosMeta) * 100"></div>
+      </div>
+    </div>
+
+    <!-- Tarjeta Ritmo Cardíaco -->
+    <div class="card-container widget-card">
+      <div class="widget-info">
+        <span class="widget-title">Ritmo Cardíaco</span>
+        <span class="widget-subtitle">-- LPM</span>
+      </div>
+      <button class="heart-action-btn">
+        <span>Registra tu<br>Ritmo</span>
+      </button>
+    </div>
+
+    <!-- Tarjeta Horas de Sueño -->
+    <div class="card-container widget-card">
+      <div class="widget-info">
+        <span class="widget-title">Horas de sueño</span>
+        <span class="widget-subtitle">{{ horasSueno }}</span>
+      </div>
+      <div class="sleep-progress-bar">
+        <div class="sleep-fill"></div>
+      </div>
+    </div>
+  </div>
+</ion-content>
