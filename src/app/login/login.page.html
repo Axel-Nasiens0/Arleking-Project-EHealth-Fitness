@@ -1,0 +1,34 @@
+<ion-content class="login-content">
+  <div class="login-wrapper">
+    <!-- Logo de Arleking Fitness guardado en src/assets/logo.png -->
+    <img src="assets/icon/logo.png" alt="Arleking Fitness" class="login-logo" />
+    
+    <h1>ARLEKING</h1>
+    <p class="subtitle">Inicia sesión para guardar o recuperar tus récords</p>
+
+    <div class="form-card">
+      <ion-input
+        label="Nombre o Apodo"
+        labelPlacement="floating"
+        fill="outline"
+        [(ngModel)]="nombre"
+        placeholder="Ej. Arleking Runner">
+      </ion-input>
+
+      <ion-input
+        label="Correo Electrónico"
+        labelPlacement="floating"
+        fill="outline"
+        type="email"
+        [(ngModel)]="correo"
+        placeholder="usuario@correo.com">
+      </ion-input>
+
+      <p class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</p>
+
+      <ion-button expand="block" shape="round" class="start-btn" (click)="entrar()">
+        Continuar
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

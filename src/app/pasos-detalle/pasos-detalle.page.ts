@@ -1,23 +1,14 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { 
-  IonContent, 
-  IonHeader, 
-  IonToolbar, 
-  IonButtons, 
-  IonBackButton, 
-  IonTitle, 
-  IonIcon 
+import { Router } from '@angular/router';
+import {
+  IonContent, IonHeader, IonToolbar, IonButtons, IonBackButton,
+  IonTitle, IonIcon, IonPopover, IonList, IonItem, IonLabel, IonToggle
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { ellipsisHorizontalSharp, chevronBackOutline } from 'ionicons/icons';
+import { ellipsisHorizontalSharp, chevronBackOutline, trophyOutline, moonOutline, sunnyOutline } from 'ionicons/icons';
 import * as L from 'leaflet';
-
-interface LecturaHoraria {
-  hora: string;
-  pasos: number;
-  colorClass: string;
-}
+import { ArlekingStateService } from '../services/arleking-state.service';
 
 @Component({
   selector: 'app-pasos-detalle',
@@ -25,112 +16,68 @@ interface LecturaHoraria {
   styleUrls: ['./pasos-detalle.page.scss'],
   standalone: true,
   imports: [
-    CommonModule, 
-    IonContent, 
-    IonHeader, 
-    IonToolbar, 
-    IonButtons, 
-    IonBackButton, 
-    IonTitle, 
-    IonIcon
+    CommonModule, IonContent, IonHeader, IonToolbar, IonButtons, IonBackButton,
+    IonTitle, IonIcon, IonPopover, IonList, IonItem, IonLabel, IonToggle
   ]
 })
 export class PasosDetallePage implements OnInit, AfterViewInit {
   private map!: L.Map;
+  private router = inject(Router);
+  public state = inject(ArlekingStateService);
+  protected Math = Math;
 
-  diasSemana = [
-    { dia: 'L', goal: false },
-    { dia: 'M', goal: false },
-    { dia: 'M', goal: true },
-    { dia: 'J', goal: true },
-    { dia: 'V', goal: false },
-    { dia: 'S', goal: false },
-    { dia: 'D', goal: true }
-  ];
-
-  pasosActuales = 6150;
-  pasosMeta = 16000;
-  caloriasActuales = 398;
   caloriasMeta = 1350;
-  tiempoActual = 99;
   tiempoMeta = 130;
-  distanciaRecorrida = 4.7;
-
-  distribucionHorarios: LecturaHoraria[] = [
-    { hora: '06:00', pasos: 2507, colorClass: 'bg-yellow' },
-    { hora: '10:00', pasos: 357, colorClass: 'bg-beige' },
-    { hora: '02:00', pasos: 3298, colorClass: 'bg-brown' },
-    { hora: '12:00', pasos: 132, colorClass: 'bg-beige' },
-    { hora: '20:00', pasos: 100, colorClass: 'bg-green' }
-  ];
+  coloresBarras = ['bg-yellow', 'bg-beige', 'bg-brown', 'bg-beige', 'bg-green'];
 
   constructor() {
-    addIcons({ ellipsisHorizontalSharp, chevronBackOutline });
+    addIcons({ ellipsisHorizontalSharp, chevronBackOutline, trophyOutline, moonOutline, sunnyOutline });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.state.iniciarAcelerometro();
+  }
 
   ngAfterViewInit() {
     this.initSatelliteMapWithGeolocation();
   }
 
   private initSatelliteMapWithGeolocation() {
-    // Coordenadas por defecto (mientras obtiene la ubicación GPS real)
     const defaultLat = 21.8469;
     const defaultLng = -102.7188;
 
-    // Inicializar mapa centrado en coordenadas iniciales
-    this.map = L.map('real-leaflet-map', {
-      zoomControl: false
-    }).setView([defaultLat, defaultLng], 16);
+    this.map = L.map('real-leaflet-map', { zoomControl: false }).setView([defaultLat, defaultLng], 15);
 
-    // 1. Capa de Imagen Satelital Esri World Imagery
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19,
-      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+      maxZoom: 19
     }).addTo(this.map);
 
-    // 2. Corregir el bug visual de renderizado al cargar la página en Ionic
-    setTimeout(() => {
-      this.map.invalidateSize();
-    }, 300);
+    setTimeout(() => this.map.invalidateSize(), 300);
 
-    // 3. Obtener ubicación en tiempo real del dispositivo
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const userLat = position.coords.latitude;
-          const userLng = position.coords.longitude;
+    // Usar Leaflet locate() que maneja mejor los permisos en móvil y web
+    this.map.locate({ setView: true, maxZoom: 17, enableHighAccuracy: true });
 
-          // Centrar el mapa satelital en la ubicación exacta del usuario
-          this.map.setView([userLat, userLng], 17);
-
-          // Marcador personalizado para la posición actual
-          const userIcon = L.divIcon({
-            className: 'custom-gps-marker',
-            html: `<div class="gps-pulse"></div>`,
-            iconSize: [20, 20],
-            iconAnchor: [10, 10]
-          });
-
-          L.marker([userLat, userLng], { icon: userIcon }).addTo(this.map);
-
-          // Forzar reajuste visual una vez centrado
-          setTimeout(() => {
-            this.map.invalidateSize();
-          }, 100);
-        },
-        (error) => {
-          console.warn('No se pudo obtener la ubicación GPS, usando ubicación predeterminada:', error);
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
-    }
+    this.map.on('locationfound', (e: L.LocationEvent) => {
+      const userIcon = L.divIcon({
+        className: 'custom-gps-marker',
+        html: `<div class="gps-pulse"></div>`,
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      });
+      L.marker(e.latlng, { icon: userIcon }).addTo(this.map);
+      setTimeout(() => this.map.invalidateSize(), 100);
+    });
   }
 
   get esGoalAlcanzado(): boolean {
-    return this.pasosActuales >= this.pasosMeta && 
-           this.caloriasActuales >= this.caloriasMeta && 
-           this.tiempoActual >= this.tiempoMeta;
+    return this.state.pasosActuales() >= this.state.pasosMetaDiaria();
+  }
+
+  async irAMetas(popover: IonPopover) {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    await popover.dismiss();
+    this.router.navigateByUrl('/metas');
   }
 }

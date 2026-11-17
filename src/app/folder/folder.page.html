@@ -1,55 +1,90 @@
 <ion-header class="ion-no-border">
   <ion-toolbar class="main-toolbar">
-    <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
-    </ion-buttons>
     <ion-title class="app-title">ARLEKING</ion-title>
     <ion-buttons slot="end">
-      <button class="icon-btn">
+      <button class="icon-btn" id="menu-tres-puntos">
         <ion-icon name="ellipsis-vertical"></ion-icon>
       </button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
+<ion-popover #menuPopover trigger="menu-tres-puntos" triggerAction="click">
+  <ng-template>
+    <ion-list lines="none">
+      <ion-item>
+        <ion-icon slot="start" [name]="state.modoNoche() ? 'sunny-outline' : 'moon-outline'"></ion-icon>
+        <ion-label>{{ state.modoNoche() ? 'Modo Claro' : 'Modo Noche' }}</ion-label>
+        <ion-toggle
+          slot="end"
+          [checked]="state.modoNoche()"
+          (ionChange)="state.setModoNoche($event.detail.checked)">
+        </ion-toggle>
+      </ion-item>
+
+      <ion-item button (click)="irAMetas(menuPopover)">
+        <ion-icon slot="start" name="trophy-outline" style="color: #D4AF37;"></ion-icon>
+        <ion-label>Mis Metas</ion-label>
+      </ion-item>
+
+      <ion-item button (click)="cerrarSesion(menuPopover)">
+        <ion-icon slot="start" name="log-out-outline" color="danger"></ion-icon>
+        <ion-label color="danger">Cerrar Sesión</ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-template>
+</ion-popover>
+
 <ion-content class="dashboard-content">
   <!-- Tarjeta Principal de la Lanza -->
   <div class="card-container sword-main-card" (click)="irADetallePasos()" [class.golden-goal]="esGoalAlcanzado">
     <div class="sword-legend">
       <div class="legend-row">
-        <span class="dot cyan"></span>
-        <span><b>{{ pasosActuales | number }}</b> Pasos</span>
+        <span class="dot" [class.cyan]="state.pasosActuales() > 0"></span>
+        <span><b>{{ state.pasosActuales() | number }}</b> Pasos</span>
       </div>
       <div class="legend-row">
-        <span class="dot pink"></span>
-        <span><b>{{ caloriasActuales }}</b> Calorías</span>
+        <span class="dot" [class.pink]="state.caloriasActuales() > 0"></span>
+        <span><b>{{ state.caloriasActuales() }}</b> Calorías</span>
       </div>
       <div class="legend-row">
-        <span class="dot purple"></span>
-        <span><b>{{ tiempoMins }}</b> mins</span>
+        <span class="dot" [class.purple]="state.tiempoActivoMins() > 0"></span>
+        <span><b>{{ state.tiempoActivoMins() }}</b> mins</span>
       </div>
     </div>
 
     <div class="sword-wrapper">
       <svg class="arleking-sword-svg" viewBox="0 0 100 240" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="43" y="130" width="14" height="90" class="sword-handle" />
-        <path d="M 50 70 Q 65 95 85 105 Q 65 115 50 140 Q 35 115 15 105 Q 35 95 50 70 Z" class="sword-guard" />
-        <circle cx="50" cy="105" r="8.5" class="sword-gem" />
-        <path d="M 50 15 L 75 45 L 75 80 L 25 80 L 25 45 Z" class="sword-blade" />
+        <!-- Mango: Morado solo si hay minutos activos -->
+        <rect x="43" y="130" width="14" height="90"
+          class="sword-handle"
+          [class.active-purple]="state.tiempoActivoMins() > 0" />
+        <!-- Guarda: Rosa solo si hay calorías quemadas -->
+        <path d="M 50 70 Q 65 95 85 105 Q 65 115 50 140 Q 35 115 15 105 Q 35 95 50 70 Z"
+          class="sword-guard"
+          [class.active-pink]="state.caloriasActuales() > 0" />
+        <!-- Gema central -->
+        <circle cx="50" cy="105" r="8.5"
+          class="sword-gem"
+          [class.active-gem]="state.pasosActuales() > 0" />
+        <!-- Punta de lanza: Cyan solo si hay pasos -->
+        <path d="M 50 15 L 75 45 L 75 80 L 25 80 L 25 45 Z"
+          class="sword-blade"
+          [class.active-cyan]="state.pasosActuales() > 0" />
       </svg>
     </div>
   </div>
 
   <!-- Contenedor Vertical de Widgets -->
   <div class="cards-stack">
-    <!-- Tarjeta de Progreso de Pasos -->
-    <div class="card-container widget-card">
+    <!-- Tarjeta de Progreso de Pasos (Fondo claro -> Relleno Cyan) -->
+    <div class="card-container widget-card" (click)="irADetallePasos()">
       <div class="widget-info">
-        <span class="widget-title"><b>{{ pasosActuales | number }}</b></span>
-        <span class="widget-subtitle">/{{ pasosMeta | number }} Pasos</span>
+        <span class="widget-title"><b>{{ state.pasosActuales() | number }}</b></span>
+        <span class="widget-subtitle">/{{ state.pasosMetaDiaria() | number }} Pasos</span>
       </div>
       <div class="steps-progress-bar">
-        <div class="progress-fill" [style.width.%]="(pasosActuales / pasosMeta) * 100"></div>
+        <div class="progress-fill" [style.width.%]="(state.pasosActuales() / state.pasosMetaDiaria()) * 100"></div>
       </div>
     </div>
 
@@ -57,21 +92,21 @@
     <div class="card-container widget-card">
       <div class="widget-info">
         <span class="widget-title">Ritmo Cardíaco</span>
-        <span class="widget-subtitle">-- LPM</span>
+        <span class="widget-subtitle">{{ state.ritmoCardiaco() ?? '--' }} LPM</span>
       </div>
       <button class="heart-action-btn">
         <span>Registra tu<br>Ritmo</span>
       </button>
     </div>
 
-    <!-- Tarjeta Horas de Sueño -->
+    <!-- Tarjeta Horas de Sueño (Fondo claro -> Relleno Rojo Intenso) -->
     <div class="card-container widget-card">
       <div class="widget-info">
         <span class="widget-title">Horas de sueño</span>
-        <span class="widget-subtitle">{{ horasSueno }}</span>
+        <span class="widget-subtitle">{{ state.horasSueno() }} Hrs</span>
       </div>
       <div class="sleep-progress-bar">
-        <div class="sleep-fill"></div>
+        <div class="sleep-fill" [style.width.%]="(state.horasSueno() / state.horasSuenoMeta) * 100"></div>
       </div>
     </div>
   </div>

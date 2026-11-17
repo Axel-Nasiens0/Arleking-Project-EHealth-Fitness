@@ -1,0 +1,123 @@
+.metas-toolbar {
+  --background: var(--arle-card-bg);
+  --border-width: 0;
+
+  .metas-title {
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--arle-text-main);
+    text-align: center;
+  }
+}
+
+.metas-content {
+  --background: var(--arle-bg);
+  --padding-start: 16px;
+  --padding-end: 16px;
+}
+
+.resumen-card {
+  background: linear-gradient(135deg, #26C6DA, #7E57C2);
+  color: #ffffff;
+  border-radius: 28px;
+  padding: 22px;
+  text-align: center;
+  margin: 12px 0 20px 0;
+  box-shadow: var(--arle-shadow);
+
+  span {
+    font-size: 0.8rem;
+    opacity: 0.9;
+    font-weight: 600;
+  }
+
+  h2 {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 4px 0 0 0;
+  }
+}
+
+.metas-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-bottom: 24px;
+}
+
+.meta-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--arle-card-bg);
+  border-radius: 24px;
+  padding: 16px;
+  box-shadow: var(--arle-shadow);
+  opacity: 0.55;
+  transition: all 0.3s ease;
+
+  &.unlocked {
+    opacity: 1;
+    border: 1.5px solid #D4AF37;
+
+    .badge-circle {
+      background: #D4AF37;
+      color: #ffffff;
+    }
+
+    .status-tag {
+      color: #D4AF37;
+      font-weight: 800;
+    }
+  }
+
+  .badge-circle {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #757575;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .meta-info {
+    flex: 1;
+
+    h3 {
+      margin: 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--arle-text-main);
+    }
+
+    p {
+      margin: 2px 0 6px 0;
+      font-size: 0.75rem;
+      color: var(--arle-text-sub);
+    }
+
+    .mini-bar {
+      height: 6px;
+      background: #e0e6ed;
+      border-radius: 4px;
+      overflow: hidden;
+
+      .mini-fill {
+        height: 100%;
+        background: #26C6DA;
+        max-width: 100%;
+        transition: width 0.3s ease;
+      }
+    }
+  }
+
+  .status-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--arle-text-sub);
+  }
+}

@@ -1,17 +1,22 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { 
-  IonHeader, 
-  IonToolbar, 
-  IonButtons, 
-  IonMenuButton, 
-  IonTitle, 
-  IonContent, 
-  IonIcon 
+import {
+  IonHeader,
+  IonToolbar,
+  IonButtons,
+  IonTitle,
+  IonContent,
+  IonIcon,
+  IonPopover,
+  IonList,
+  IonItem,
+  IonLabel,
+  IonToggle
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { ellipsisVertical, heart, bed, flame, footsteps } from 'ionicons/icons';
+import { ellipsisVertical, trophyOutline, moonOutline, sunnyOutline, logOutOutline } from 'ionicons/icons';
+import { ArlekingStateService } from '../services/arleking-state.service';
 
 @Component({
   selector: 'app-folder',
@@ -19,37 +24,57 @@ import { ellipsisVertical, heart, bed, flame, footsteps } from 'ionicons/icons';
   styleUrls: ['./folder.page.scss'],
   standalone: true,
   imports: [
-    CommonModule, 
-    IonHeader, 
-    IonToolbar, 
-    IonButtons, 
-    IonMenuButton, 
-    IonTitle, 
-    IonContent, 
-    IonIcon
+    CommonModule,
+    IonHeader,
+    IonToolbar,
+    IonButtons,
+    IonTitle,
+    IonContent,
+    IonIcon,
+    IonPopover,
+    IonList,
+    IonItem,
+    IonLabel,
+    IonToggle
   ],
 })
-export class FolderPage {
+export class FolderPage implements OnInit {
   private router = inject(Router);
-
-  // Datos reales o simulados del estado actual
-  pasosActuales = 3670;
-  pasosMeta = 16000;
-  caloriasActuales = 400;
-  tiempoMins = 67;
-
-  ritmoCardiaco = 79; // LPM
-  horasSueno = '7 Hrs';
+  public state = inject(ArlekingStateService);
 
   constructor() {
-    addIcons({ ellipsisVertical, heart, bed, flame, footsteps });
+    addIcons({ ellipsisVertical, trophyOutline, moonOutline, sunnyOutline, logOutOutline });
+  }
+
+  ngOnInit() {
+    this.state.iniciarAcelerometro();
   }
 
   get esGoalAlcanzado(): boolean {
-    return this.pasosActuales >= this.pasosMeta;
+    return this.state.pasosActuales() >= this.state.pasosMetaDiaria();
+  }
+
+  private quitarFocoActivo() {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
   }
 
   irADetallePasos() {
+    this.quitarFocoActivo();
     this.router.navigateByUrl('/pasos-detalle');
+  }
+
+  async irAMetas(popover: IonPopover) {
+    this.quitarFocoActivo();
+    await popover.dismiss();
+    this.router.navigateByUrl('/metas');
+  }
+
+  async cerrarSesion(popover: IonPopover) {
+    this.quitarFocoActivo();
+    await popover.dismiss();
+    this.state.cerrarSesion();
+    this.router.navigateByUrl('/login', { replaceUrl: true });
   }
 }

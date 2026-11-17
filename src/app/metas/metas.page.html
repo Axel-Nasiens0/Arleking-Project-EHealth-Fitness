@@ -1,0 +1,33 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar class="metas-toolbar">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/folder" text="" icon="chevron-back-outline"></ion-back-button>
+    </ion-buttons>
+    <ion-title class="metas-title">METAS</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="metas-content">
+  <div class="resumen-card">
+    <span>Pasos Históricos Acumulados</span>
+    <h2>{{ state.pasosHistoricos() | number }}</h2>
+  </div>
+
+  <div class="metas-list">
+    <div *ngFor="let meta of state.metas()" class="meta-card" [class.unlocked]="meta.desbloqueada">
+      <div class="badge-circle">
+        <ion-icon [name]="meta.desbloqueada ? meta.icono : 'lock-closed'"></ion-icon>
+      </div>
+      <div class="meta-info">
+        <h3>{{ meta.titulo }}</h3>
+        <p>{{ meta.descripcion }}</p>
+        <div class="mini-bar">
+          <div class="mini-fill" [style.width.%]="(state.pasosHistoricos() / meta.pasosRequeridos) * 100"></div>
+        </div>
+      </div>
+      <span class="status-tag">
+        {{ meta.desbloqueada ? 'DESBLOQUEADA' : (meta.pasosRequeridos | number) }}
+      </span>
+    </div>
+  </div>
+</ion-content>

@@ -1,27 +1,35 @@
 .main-toolbar {
-  --background: #ffffff;
+  --background: var(--arle-card-bg);
   --border-width: 0;
 
   .app-title {
     font-weight: 800;
     letter-spacing: 2px;
-    color: #1a1a1a;
+    color: var(--arle-text-main);
     text-align: center;
+  }
+
+  .icon-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.4rem;
+    color: var(--arle-text-main);
+    padding: 8px;
   }
 }
 
 .dashboard-content {
-  --background: #f8f9fc;
+  --background: var(--arle-bg);
   --padding-start: 16px;
   --padding-end: 16px;
 
-  /* Contenedores de Tarjeta Generales */
   .card-container {
-    background: #ffffff;
-    border-radius: 32px; /* Esquinas muy redondeadas como en el prototipo */
+    background: var(--arle-card-bg);
+    border-radius: 32px;
     padding: 20px 24px;
     margin-bottom: 14px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--arle-shadow);
+    transition: background-color 0.3s ease;
   }
 
   /* 1. Tarjeta Principal de la Lanza */
@@ -29,6 +37,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: pointer;
 
     .sword-legend {
       display: flex;
@@ -45,6 +54,8 @@
           height: 14px;
           border-radius: 50%;
           display: inline-block;
+          background-color: var(--arle-empty-stroke);
+          transition: background-color 0.3s ease;
 
           &.cyan { background-color: #26C6DA; }
           &.pink { background-color: #E91E63; }
@@ -54,11 +65,9 @@
         span {
           font-size: 0.9rem;
           font-weight: 600;
-          color: #1a1a1a;
+          color: var(--arle-text-main);
 
-          b {
-            font-weight: 800;
-          }
+          b { font-weight: 800; }
         }
       }
     }
@@ -72,51 +81,36 @@
         width: 80px;
         height: 180px;
 
-        /* Estado Normal */
-        .sword-blade {
-          stroke: #26C6DA;
+        /* Estado Inicial Vacío (Sin datos) */
+        .sword-blade,
+        .sword-guard,
+        .sword-handle {
+          stroke: var(--arle-empty-stroke);
           stroke-width: 3.5;
-          fill: #ffffff;
+          fill: var(--arle-card-bg);
           stroke-linejoin: round;
-        }
-
-        .sword-guard {
-          stroke: #E91E63;
-          stroke-width: 3.5;
-          fill: #ffffff;
-          stroke-linejoin: round;
+          transition: stroke 0.3s ease, fill 0.3s ease;
         }
 
         .sword-gem {
-          fill: #1A1A1A;
-          stroke: none;
+          fill: var(--arle-empty-stroke);
+          transition: fill 0.3s ease;
         }
 
-        .sword-handle {
-          stroke: #7E57C2;
-          stroke-width: 3.5;
-          fill: #ffffff;
-          stroke-linejoin: round;
-        }
+        /* Estados Activos al registrar movimiento */
+        .active-cyan { stroke: #26C6DA; }
+        .active-pink { stroke: #E91E63; }
+        .active-purple { stroke: #7E57C2; }
+        .active-gem { fill: var(--arle-text-main); }
       }
     }
 
     /* Estado Dorado (Meta alcanzada) */
     &.golden-goal {
-      .sword-legend .dot {
-        background-color: #D4AF37 !important;
-      }
-
+      .sword-legend .dot { background-color: #D4AF37 !important; }
       .arleking-sword-svg {
-        .sword-blade,
-        .sword-guard,
-        .sword-handle {
-          stroke: #D4AF37;
-        }
-
-        .sword-gem {
-          fill: #D4AF37;
-        }
+        .sword-blade, .sword-guard, .sword-handle { stroke: #D4AF37 !important; }
+        .sword-gem { fill: #D4AF37 !important; }
       }
     }
   }
@@ -142,33 +136,34 @@
         .widget-title {
           font-size: 0.95rem;
           font-weight: 700;
-          color: #1a1a1a;
+          color: var(--arle-text-main);
         }
 
         .widget-subtitle {
           font-size: 0.8rem;
-          color: #8c8c8c;
+          color: var(--arle-text-sub);
           font-weight: 500;
         }
       }
 
-      /* Barra de progreso horizontal (Tarjeta de Pasos) */
+      /* Barra de Progreso de Pasos (Fondo Cyan Claro -> Relleno Cyan Intenso) */
       .steps-progress-bar {
         width: 140px;
         height: 22px;
-        background-color: #2b3a55;
+        background-color: #d6f4f8;
         border-radius: 12px;
         overflow: hidden;
 
         .progress-fill {
           height: 100%;
-          width: 60%; /* Ajustar dinámicamente con [style.width.%] */
-          background-color: #64c2a6;
+          max-width: 100%;
+          background-color: #26C6DA;
           border-radius: 12px;
+          transition: width 0.3s ease;
         }
       }
 
-      /* Botón Dorado Circular (Tarjeta Ritmo Cardíaco) */
+      /* Botón Dorado Circular (Ritmo Cardíaco) */
       .heart-action-btn {
         width: 50px;
         height: 50px;
@@ -188,27 +183,22 @@
           text-align: center;
           line-height: 1;
         }
-
-        ion-icon {
-          font-size: 1rem;
-          color: #4a3b10;
-          margin-top: 2px;
-        }
       }
 
-      /* Barra Horizontal Roja (Tarjeta Sueño) */
+      /* Barra Horizontal Sueño (Fondo Coral Claro -> Relleno Rojo Intenso) */
       .sleep-progress-bar {
         width: 140px;
         height: 22px;
-        background-color: #f7a072;
+        background-color: #fde4dd;
         border-radius: 12px;
         overflow: hidden;
 
         .sleep-fill {
           height: 100%;
-          width: 85%;
+          max-width: 100%;
           background-color: #d94e34;
           border-radius: 12px;
+          transition: width 0.3s ease;
         }
       }
     }
