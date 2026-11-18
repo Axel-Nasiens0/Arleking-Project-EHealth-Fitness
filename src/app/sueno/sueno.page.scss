@@ -1,82 +1,80 @@
-/* Forzar fondo blanco y evitar desbordamientos */
-:host {
-  display: block;
-  background-color: #ffffff !important;
-  color: #111111;
+.custom-toolbar {
+  --background: var(--arle-card-bg);
+  --border-width: 0;
+
+  .app-title {
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--arle-text-main);
+    text-align: center;
+    font-size: 1.1rem;
+  }
+
+  .icon-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.3rem;
+    color: var(--arle-text-main);
+    padding: 8px;
+    cursor: pointer;
+  }
 }
 
 .sueno-content {
-  --background: #ffffff;
-  background-color: #ffffff;
+  --background: var(--arle-bg);
 }
 
 .dashboard-container {
-  padding: 20px;
-  max-width: 420px;
+  padding: 16px;
+  max-width: 440px;
   margin: 0 auto;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  background-color: #ffffff;
   min-height: 100%;
-}
-
-.header-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 25px;
-
-  .nav-icon-wrapper {
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
-    color: #000;
-  }
-
-  .title {
-    font-size: 1.1rem;
-    font-weight: 800;
-    letter-spacing: 2px;
-    margin: 0;
-    color: #000;
-  }
 }
 
 .weekly-container {
   display: flex;
   justify-content: space-between;
   gap: 6px;
-  margin-bottom: 20px;
+  background: var(--arle-card-bg);
+  padding: 12px 10px;
+  border-radius: 32px;
+  box-shadow: var(--arle-shadow);
+  margin-bottom: 18px;
 
   .day-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     cursor: pointer;
-    padding: 6px 4px;
+    padding: 6px 5px;
     border-radius: 16px;
-    transition: background 0.2s;
+    transition: background 0.2s ease, opacity 0.2s ease;
 
     &.selected {
-      background: #f7f9fc;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      background: var(--arle-bg);
+    }
+
+    &.locked-day {
+      opacity: 0.4;
+      cursor: not-allowed;
+      pointer-events: none;
     }
 
     .day-label {
       font-size: 0.75rem;
-      font-weight: 600;
-      color: #666;
+      font-weight: 700;
+      color: var(--arle-text-sub);
       margin-bottom: 4px;
     }
 
     .ring-wrapper {
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       position: relative;
 
       .progress-ring {
         width: 100%;
         height: 100%;
-        
         circle {
           transition: stroke-dashoffset 0.3s ease;
         }
@@ -85,41 +83,40 @@
   }
 }
 
-.divider {
-  border: none;
-  height: 1px;
-  background: #EAEFF5;
-  margin-bottom: 25px;
-}
-
 .card-sueno {
-  background: #ffffff;
-  border-radius: 24px;
+  background: var(--arle-card-bg);
+  border-radius: 32px;
   padding: 24px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
-  border: 1px solid #f0f4f8;
-  margin-bottom: 30px;
+  box-shadow: var(--arle-shadow);
+  margin-bottom: 24px;
 
   .card-header {
-    margin-bottom: 15px;
+    margin-bottom: 12px;
+
     .card-title {
       font-size: 1rem;
-      font-weight: 600;
-      color: #111;
+      font-weight: 700;
+      color: var(--arle-text-main);
     }
   }
 
   .card-body {
     .time-main-row {
       margin-bottom: 6px;
+
       .value {
         font-size: 1.8rem;
-        font-weight: 700;
+        font-weight: 800;
+
+        &.empty-val {
+          color: var(--arle-text-sub);
+        }
       }
     }
+
     .time-sub {
       font-size: 0.85rem;
-      color: #888;
+      color: var(--arle-text-sub);
     }
   }
 }
@@ -127,17 +124,17 @@
 .bottom-action {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  margin-top: 16px;
 
   .btn-medir {
-    background: #ffffff;
-    border: 1px solid #EAEFF5;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    background: var(--arle-card-bg);
+    border: 1px solid var(--arle-empty-stroke);
+    box-shadow: var(--arle-shadow);
     padding: 14px 60px;
     border-radius: 30px;
     font-size: 1rem;
-    font-weight: 600;
-    color: #111;
+    font-weight: 700;
+    color: var(--arle-text-main);
     cursor: pointer;
     transition: transform 0.1s;
 
@@ -145,9 +142,15 @@
       transform: scale(0.97);
     }
   }
+
+  .info-registrado-txt {
+    color: #DCA038;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
 }
 
-/* VISTA DE REGISTRO - TAMAÑOS CONTROLADOS PARA QUE NO SE EXPANDA */
+/* VISTA DE REGISTRO - MODO CLARO ORIGINAL */
 .register-card-wrapper {
   display: flex;
   flex-direction: column;
@@ -160,7 +163,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #ffffff;
 
     .date-badge {
       background: #EAF4FC;
@@ -174,8 +176,8 @@
 
     .interactive-circle-container {
       position: relative;
-      width: 180px;   /* Tamaño fijo controlado */
-      height: 180px;  /* Tamaño fijo controlado */
+      width: 180px;
+      height: 180px;
       cursor: pointer;
       touch-action: none;
       margin-bottom: 15px;
@@ -196,37 +198,41 @@
 
         .time-range-text {
           font-size: 0.8rem;
-          font-weight: 600;
-          color: #333;
+          font-weight: 700;
+          color: var(--arle-text-main);
           line-height: 1.3;
-          
+
           .empty-prompt {
             font-size: 0.7rem;
-            color: #888;
+            color: var(--arle-text-sub);
           }
         }
 
         .manual-inputs-box {
-          background: #fff;
+          background: var(--arle-card-bg);
           padding: 8px;
           border-radius: 12px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+          box-shadow: var(--arle-shadow);
+          border: 1px solid var(--arle-empty-stroke);
 
           .input-row {
             display: flex;
             flex-direction: column;
             margin-bottom: 4px;
             text-align: left;
-            
+
             label {
               font-size: 0.65rem;
-              color: #666;
+              color: var(--arle-text-sub);
             }
+
             input {
               font-size: 0.8rem;
               padding: 2px;
-              border: 1px solid #ddd;
+              border: 1px solid var(--arle-empty-stroke);
               border-radius: 4px;
+              background: var(--arle-bg);
+              color: var(--arle-text-main);
             }
           }
 
@@ -241,10 +247,18 @@
               border-radius: 4px;
               padding: 4px;
               font-size: 0.75rem;
+              font-weight: 600;
               cursor: pointer;
-              
-              &.btn-ok { background: #68B0E8; color: #fff; }
-              &.btn-cancel { background: #eee; color: #333; }
+
+              &.btn-ok {
+                background: #68B0E8;
+                color: #fff;
+              }
+
+              &.btn-cancel {
+                background: var(--arle-empty-stroke);
+                color: var(--arle-text-main);
+              }
             }
           }
         }
@@ -253,9 +267,10 @@
 
     .register-hours-result {
       margin-bottom: 10px;
+
       .res-value {
         font-size: 1.2rem;
-        font-weight: 700;
+        font-weight: 800;
       }
     }
 
@@ -264,7 +279,7 @@
       color: #856404;
       font-size: 0.75rem;
       padding: 8px 12px;
-      border-radius: 8px;
+      border-radius: 12px;
       margin-top: 5px;
       text-align: center;
       border: 1px solid #ffeeba;
@@ -283,7 +298,7 @@
       padding: 14px;
       border-radius: 30px;
       font-size: 0.95rem;
-      font-weight: 600;
+      font-weight: 700;
       border: none;
       cursor: pointer;
 
@@ -294,6 +309,36 @@
       &.save {
         background: #E2F1ED;
         color: #0E6C55;
+      }
+    }
+  }
+}
+
+/* ACENTOS ROJOS EXCLUSIVOS PARA MODO NOCHE */
+:host-context(body.dark-theme) {
+  .register-card-wrapper {
+    .register-box {
+      .date-badge {
+        background: rgba(217, 78, 52, 0.2);
+        color: #ff8a73;
+      }
+
+      .circle-inner-content .manual-inputs-box .manual-actions button.btn-ok {
+        background: #D94E34;
+        color: #ffffff;
+      }
+    }
+
+    .register-actions {
+      .btn-action.cancel {
+        background: var(--arle-card-bg);
+        color: var(--arle-text-sub);
+        border: 1px solid var(--arle-empty-stroke);
+      }
+
+      .btn-action.save {
+        background: #D94E34;
+        color: #ffffff;
       }
     }
   }

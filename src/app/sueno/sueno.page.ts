@@ -1,8 +1,29 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { IonContent, IonHeader, IonToggle, IonToolbar, IonButtons, IonBackButton, IonPopover, IonItem, IonList, IonIcon, IonLabel, IonTitle } from '@ionic/angular';
+import { Router } from '@angular/router';
+import {
+  IonContent,
+  IonHeader,
+  IonToggle,
+  IonToolbar,
+  IonButtons,
+  IonBackButton,
+  IonPopover,
+  IonItem,
+  IonList,
+  IonIcon,
+  IonLabel,
+  IonTitle
+} from '@ionic/angular';
+import { addIcons } from 'ionicons';
+import {
+  ellipsisHorizontalSharp,
+  chevronBackOutline,
+  trophyOutline,
+  moonOutline,
+  sunnyOutline
+} from 'ionicons/icons';
 import { ArlekingStateService } from '../services/arleking-state.service';
 
 interface DiaProgreso {
@@ -18,30 +39,38 @@ interface DiaProgreso {
 @Component({
   selector: 'app-sueno',
   standalone: true,
-  imports: [IonList, IonItem, IonToolbar, IonToggle, IonHeader, CommonModule, FormsModule, RouterLink, IonContent, IonButtons, IonBackButton, IonPopover, IonIcon, IonLabel, IonTitle],
+  imports: [
+    CommonModule,
+    FormsModule,
+    IonList,
+    IonItem,
+    IonToolbar,
+    IonToggle,
+    IonHeader,
+    IonContent,
+    IonButtons,
+    IonBackButton,
+    IonPopover,
+    IonIcon,
+    IonLabel,
+    IonTitle
+  ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './sueno.page.html',
   styleUrls: ['./sueno.page.scss']
 })
 export class SuenoPage {
   private router = inject(Router);
-  private arlekingState = inject(ArlekingStateService);
+  public state = inject(ArlekingStateService);
 
   viewMode = signal<'dashboard' | 'register'>('dashboard');
-  selectedDayKey = 'lunes';
 
-  // Fecha dinámica automática en español
+  // Índice del día actual (0 = Lunes, 1 = Martes, ..., 6 = Domingo)
+  hoyIndex: number = this.obtenerIndiceDiaHoy();
+  selectedDayKey = this.obtenerClaveDiaHoy();
   fechaActual: string = this.obtenerFechaActualFormateada();
 
-  semana = signal<DiaProgreso[]>([
-    { key: 'lunes', dia: 'L', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false },
-    { key: 'martes', dia: 'M', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false },
-    { key: 'miercoles', dia: 'M', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false },
-    { key: 'jueves', dia: 'J', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false },
-    { key: 'viernes', dia: 'V', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false },
-    { key: 'sabado', dia: 'S', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false },
-    { key: 'domingo', dia: 'D', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false }
-  ]);
+  semana = signal<DiaProgreso[]>(this.cargarSemanaLocal());
 
   tempHoras = signal<number>(0);
   tempMinutos = signal<number>(0);
@@ -56,16 +85,77 @@ export class SuenoPage {
 
   isDragging = false;
 
+  constructor() {
+    addIcons({
+      ellipsisHorizontalSharp,
+      chevronBackOutline,
+      trophyOutline,
+      moonOutline,
+      sunnyOutline
+    });
+  }
+
+  private obtenerIndiceDiaHoy(): number {
+    const jsDay = new Date().getDay(); // 0 = Domingo, 1 = Lunes...
+    return jsDay === 0 ? 6 : jsDay - 1;
+  }
+
+  private obtenerClaveDiaHoy(): string {
+    const claves = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+    return claves[this.obtenerIndiceDiaHoy()];
+  }
+
+  private crearSemanaInicial(): DiaProgreso[] {
+    return [
+      { key: 'lunes', dia: 'L', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false },
+      { key: 'martes', dia: 'M', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false },
+      { key: 'miercoles', dia: 'M', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false },
+      { key: 'jueves', dia: 'J', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false },
+      { key: 'viernes', dia: 'V', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false },
+      { key: 'sabado', dia: 'S', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false },
+      { key: 'domingo', dia: 'D', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false }
+    ];
+  }
+
+  private cargarSemanaLocal(): DiaProgreso[] {
+    const correo = this.state.usuario()?.correo || 'default';
+    const raw = localStorage.getItem(`arleking_sueno_${correo}`);
+    return raw ? JSON.parse(raw) : this.crearSemanaInicial();
+  }
+
+  private guardarSemanaLocal(lista: DiaProgreso[]) {
+    const correo = this.state.usuario()?.correo || 'default';
+    localStorage.setItem(`arleking_sueno_${correo}`, JSON.stringify(lista));
+  }
+
   obtenerFechaActualFormateada(): string {
     const hoy = new Date();
     const dia = hoy.getDate();
     const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-    const mes = meses[hoy.getMonth()];
-    const anio = hoy.getFullYear();
-    return `${dia} / ${mes} / ${anio}`;
+    return `${dia} / ${meses[hoy.getMonth()]} / ${hoy.getFullYear()}`;
   }
 
-  seleccionarDia(d: DiaProgreso) {
+  esDiaFuturo(index: number): boolean {
+    return index > this.hoyIndex;
+  }
+
+  esDiaFuturoPorClave(key: string): boolean {
+    const index = this.semana().findIndex(d => d.key === key);
+    return index > this.hoyIndex;
+  }
+
+  esDiaPasado(index: number): boolean {
+    return index < this.hoyIndex;
+  }
+
+  esDiaHoy(key: string): boolean {
+    return key === this.obtenerClaveDiaHoy();
+  }
+
+  seleccionarDia(d: DiaProgreso, index: number) {
+    if (this.esDiaFuturo(index)) {
+      return;
+    }
     this.selectedDayKey = d.key;
   }
 
@@ -75,7 +165,9 @@ export class SuenoPage {
 
   abrirRegistro() {
     const diaActual = this.getDiaSeleccionado();
-    if (diaActual.registrado) return;
+    if (this.esDiaFuturoPorClave(diaActual.key) || diaActual.registrado) {
+      return;
+    }
 
     this.tempHoras.set(7);
     this.tempMinutos.set(0);
@@ -92,6 +184,8 @@ export class SuenoPage {
   }
 
   guardarRegistro() {
+    if (this.esDiaFuturoPorClave(this.selectedDayKey)) return;
+
     const h = this.tempHoras();
     const m = this.tempMinutos();
     if (h === 0 && m === 0) return;
@@ -99,21 +193,28 @@ export class SuenoPage {
     const porc = this.tempPorcentaje();
     const rangoStr = `${this.tempHoraInicio()} - ${this.tempHoraFin()}`;
 
-    this.semana.update(list => 
-      list.map(d => {
-        if (d.key === this.selectedDayKey) {
-          return {
-            ...d,
-            porcentaje: porc,
-            horas: h,
-            minutos: m,
-            rango: rangoStr,
-            registrado: true
-          };
-        }
-        return d;
-      })
-    );
+    const nuevaSemana = this.semana().map(d => {
+      if (d.key === this.selectedDayKey) {
+        return {
+          ...d,
+          porcentaje: porc,
+          horas: h,
+          minutos: m,
+          rango: rangoStr,
+          registrado: true
+        };
+      }
+      return d;
+    });
+
+    this.semana.set(nuevaSemana);
+    this.guardarSemanaLocal(nuevaSemana);
+
+    // Sincronizar con el Dashboard principal (folder) si se registró el día de hoy
+    if (this.esDiaHoy(this.selectedDayKey)) {
+      const totalHorasDecimal = Number((h + m / 60).toFixed(1));
+      this.state.horasSueno.set(totalHorasDecimal);
+    }
 
     this.viewMode.set('dashboard');
   }
@@ -128,15 +229,12 @@ export class SuenoPage {
 
     const [hStart, mStart] = this.manualHoraInicio.split(':').map(Number);
     const [hEnd, mEnd] = this.manualHoraFin.split(':').map(Number);
-
-    const maxMinutes = 10 * 60; // Límite de 10 horas
+    const maxMinutes = 10 * 60;
 
     const startTotalMins = hStart * 60 + mStart;
     const endTotalMins = hEnd * 60 + mEnd;
     let rawDiffMins = endTotalMins - startTotalMins;
-    if (rawDiffMins <= 0) {
-      rawDiffMins += 24 * 60;
-    }
+    if (rawDiffMins <= 0) rawDiffMins += 24 * 60;
 
     if (rawDiffMins > maxMinutes) {
       this.warningMessage.set('No es saludable. Se recomienda descansar de 7 a 9 horas.');
@@ -158,7 +256,6 @@ export class SuenoPage {
 
     this.tempHoraInicio.set(this.formatTime12h(hStart, mStart));
     this.tempHoraFin.set(this.formatTime12h(eH, eM));
-
     this.showManualInputs.set(false);
   }
 
@@ -200,7 +297,6 @@ export class SuenoPage {
 
     let deg = rad * (180 / Math.PI);
 
-    // BARRERA ANTIRREBOTE: Si ya está en 8+ horas y el cursor cruza bruscamente el eje, lo fijamos en 360
     const horasActuales = this.tempHoras();
     if (horasActuales >= 8 && (deg < 90 || deg > 270)) {
       deg = 360;
@@ -210,7 +306,7 @@ export class SuenoPage {
   }
 
   actualizarValoresPorAngulo(deg: number) {
-    const maxMinutes = 10 * 60; // 10 horas máximo
+    const maxMinutes = 10 * 60;
     const horasActuales = this.tempHoras();
 
     let degLimitado = deg;
@@ -236,7 +332,6 @@ export class SuenoPage {
     let finalHoras = minutos === 60 ? horas + 1 : horas;
     let finalMinutos = minutos === 60 ? 0 : minutos;
 
-    // Tope estricto de seguridad a 10 horas 0 minutos
     if (finalHoras >= 10 || gradosFinales >= 360) {
       finalHoras = 10;
       finalMinutos = 0;
@@ -246,27 +341,19 @@ export class SuenoPage {
     const finalH = Math.floor(finalClampedMins / 60);
     const finalM = finalClampedMins % 60;
 
-    const porcentaje = Math.min(Math.round((finalClampedMins / maxMinutes) * 100), 100);
-    this.tempPorcentaje.set(porcentaje);
-
+    this.tempPorcentaje.set(Math.min(Math.round((finalClampedMins / maxMinutes) * 100), 100));
     this.tempHoras.set(finalH);
     this.tempMinutos.set(finalM);
 
-    const startMins = 23 * 60; 
-    let endMins = (startMins + finalClampedMins) % (24 * 60);
-
-    const endHour24 = Math.floor(endMins / 60);
-    const endMin = endMins % 60;
-
+    const startMins = 23 * 60;
+    const endMins = (startMins + finalClampedMins) % (24 * 60);
     this.tempHoraInicio.set('11:00 pm');
-    this.tempHoraFin.set(this.formatTime12h(endHour24, endMin));
+    this.tempHoraFin.set(this.formatTime12h(Math.floor(endMins / 60), endMins % 60));
   }
 
   getCircleDashOffset(): number {
     const circunferencia = 2 * Math.PI * 80;
-    if (this.tempHoras() === 0 && this.tempMinutos() === 0) {
-      return circunferencia;
-    }
+    if (this.tempHoras() === 0 && this.tempMinutos() === 0) return circunferencia;
     const totalDecimal = this.tempHoras() + (this.tempMinutos() / 60);
     const progress = Math.min(Math.max(totalDecimal / 10, 0), 1);
     return circunferencia - (progress * circunferencia);
@@ -275,5 +362,13 @@ export class SuenoPage {
   getCircleDashOffsetVal(porcentaje: number): number {
     const circunferencia = 2 * Math.PI * 18;
     return circunferencia - (porcentaje / 100) * circunferencia;
+  }
+
+  async irAMetas(popover: IonPopover) {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+    await popover.dismiss();
+    this.router.navigateByUrl('/metas');
   }
 }

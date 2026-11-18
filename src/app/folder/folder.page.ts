@@ -71,11 +71,8 @@ export class FolderPage implements OnInit {
     this.router.navigateByUrl('/metas');
   }
 
-  async irAsueno(popover?: IonPopover) {
+  irASueno() {
     this.quitarFocoActivo();
-    if (popover) {
-      await popover.dismiss();
-    }
     this.router.navigateByUrl('/sueno');
   }
 

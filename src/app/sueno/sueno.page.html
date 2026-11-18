@@ -1,18 +1,24 @@
 <ion-header class="ion-no-border">
   <ion-toolbar class="custom-toolbar">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/folder" text="" icon="chevron-back-outline"></ion-back-button>
+      @if (viewMode() === 'dashboard') {
+        <ion-back-button defaultHref="/folder" text="" icon="chevron-back-outline"></ion-back-button>
+      } @else {
+        <button class="icon-btn" (click)="cancelarRegistro()">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </button>
+      }
     </ion-buttons>
     <ion-title class="app-title">ARLEKING</ion-title>
     <ion-buttons slot="end">
-      <button class="icon-btn" id="menu-tres-puntos-detalle">
+      <button class="icon-btn" id="menu-tres-puntos-sueno">
         <ion-icon name="ellipsis-horizontal-sharp"></ion-icon>
       </button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-popover #menuDetallePopover trigger="menu-tres-puntos-detalle" triggerAction="click">
+<ion-popover #menuSuenoPopover trigger="menu-tres-puntos-sueno" triggerAction="click">
   <ng-template>
     <ion-list lines="none">
       <ion-item>
@@ -25,7 +31,7 @@
         </ion-toggle>
       </ion-item>
 
-      <ion-item button (click)="irAMetas(menuDetallePopover)">
+      <ion-item button (click)="irAMetas(menuSuenoPopover)">
         <ion-icon slot="start" name="trophy-outline" style="color: #D4AF37;"></ion-icon>
         <ion-label>Mis Metas</ion-label>
       </ion-item>
@@ -38,23 +44,21 @@
 
     <!-- ================= VISTA 1: DASHBOARD PRINCIPAL ================= -->
     @if (viewMode() === 'dashboard') {
-      <div class="header-bar">
-        <div class="nav-icon-wrapper" routerLink="/folder"></div>
-        <h2 class="title">ARLEKING</h2>
-        <div class="nav-icon-wrapper">•••</div>
-      </div>
-
       <!-- Selector Semanal (L, M, M, J, V, S, D) -->
       <div class="weekly-container">
-        @for (d of semana(); track d.key) {
-          <div class="day-card" [class.selected]="d.key === selectedDayKey" (click)="seleccionarDia(d)">
+        @for (d of semana(); track d.key; let i = $index) {
+          <div
+            class="day-card"
+            [class.selected]="d.key === selectedDayKey"
+            [class.locked-day]="esDiaFuturo(i)"
+            (click)="seleccionarDia(d, i)">
             <span class="day-label">{{ d.dia }}</span>
             <div class="ring-wrapper">
               <svg viewBox="0 0 44 44" class="progress-ring">
-                <circle cx="22" cy="22" r="18" fill="none" stroke="#EAEFF5" stroke-width="4"></circle>
+                <circle cx="22" cy="22" r="18" fill="none" stroke="var(--arle-empty-stroke)" stroke-width="4"></circle>
                 @if (d.porcentaje > 0) {
                   <circle cx="22" cy="22" r="18" fill="none"
-                          [attr.stroke]="d.horas >= 8 ? '#DCA038' : '#68B0E8'"
+                          [attr.stroke]="d.horas >= 8 ? '#DCA038' : (state.modoNoche() ? '#D94E34' : '#68B0E8')"
                           stroke-width="4" stroke-linecap="round"
                           stroke-dasharray="113.09"
                           [attr.stroke-dashoffset]="getCircleDashOffsetVal(d.porcentaje)"
@@ -67,8 +71,6 @@
         }
       </div>
 
-      <hr class="divider" />
-
       <!-- Tarjeta de Horas de Sueño del Día Seleccionado -->
       <div class="card-sueno">
         <div class="card-header">
@@ -78,7 +80,7 @@
         <div class="card-body">
           @if (getDiaSeleccionado().registrado) {
             <div class="time-main-row">
-              <span class="value" [style.color]="getDiaSeleccionado().horas >= 8 ? '#DCA038' : '#68B0E8'">
+              <span class="value" [style.color]="getDiaSeleccionado().horas >= 8 ? '#DCA038' : (state.modoNoche() ? '#D94E34' : '#68B0E8')">
                 {{ getDiaSeleccionado().horas }}hrs {{ getDiaSeleccionado().minutos }}mins
               </span>
             </div>
@@ -87,36 +89,29 @@
             </div>
           } @else {
             <div class="time-main-row">
-              <span class="value" style="color: #AAAAAA;">Sin registro</span>
+              <span class="value empty-val">Sin registro</span>
             </div>
             <div class="time-sub">
-              ¡No hay datos para este día, Mide tu sueño ahora!
+              ¡No hay datos para este día, mide tu sueño ahora!
             </div>
           }
         </div>
       </div>
 
-      <!-- Botón Medir -->
+      <!-- Botón Medir: Disponible para hoy y días anteriores sin registro -->
       <div class="bottom-action">
-        @if (!getDiaSeleccionado().registrado) {
+        @if (!esDiaFuturoPorClave(getDiaSeleccionado().key) && !getDiaSeleccionado().registrado) {
           <button class="btn-medir" (click)="abrirRegistro()">
             Medir
           </button>
-        } @else {
-          <div class="info-registrado-txt" style="color: #DCA038; font-weight: 600;">Día registrado correctamente!!</div>
+        } @else if (getDiaSeleccionado().registrado) {
+          <div class="info-registrado-txt">Día registrado correctamente</div>
         }
       </div>
     }
 
-
     <!-- ================= VISTA 2: REGISTRO / CÍRCULO INTERACTIVO ================= -->
     @if (viewMode() === 'register') {
-      <div class="header-bar">
-        <div class="nav-icon-wrapper cursor-pointer" (click)="cancelarRegistro()"></div>
-        <h2 class="title">ARLEKING</h2>
-        <div class="nav-icon-wrapper">•••</div>
-      </div>
-
       <div class="register-card-wrapper">
         <div class="card-sueno register-box">
           <div class="date-badge">{{ fechaActual }}</div>
@@ -129,10 +124,10 @@
                (pointercancel)="stopDrag()">
             
             <svg viewBox="0 0 200 200" class="interactive-ring-svg">
-              <circle cx="100" cy="100" r="80" fill="none" stroke="#F0F4F8" stroke-width="16"></circle>
+              <circle cx="100" cy="100" r="80" fill="none" stroke="var(--arle-empty-stroke)" stroke-width="16"></circle>
               @if (tempHoras() > 0 || tempMinutos() > 0) {
                 <circle cx="100" cy="100" r="80" fill="none"
-                        [attr.stroke]="tempHoras() >= 8 ? '#DCA038' : '#68B0E8'"
+                        [attr.stroke]="tempHoras() >= 8 ? '#DCA038' : (state.modoNoche() ? '#D94E34' : '#68B0E8')"
                         stroke-width="16" stroke-linecap="round"
                         stroke-dasharray="502.65"
                         [attr.stroke-dashoffset]="getCircleDashOffset()"
@@ -141,12 +136,12 @@
               }
             </svg>
 
-            <!-- CONTENEDOR CENTRAL: Muestra Horas o Inputs Manuales -->
+            <!-- CONTENEDOR CENTRAL -->
             <div class="circle-inner-content" 
-                 (click)="$event.stopPropagation();" 
-                 (mousedown)="$event.stopPropagation();" 
-                 (touchstart)="$event.stopPropagation();"
-                 (pointerdown)="$event.stopPropagation();">
+                 (click)="$event.stopPropagation()" 
+                 (mousedown)="$event.stopPropagation()" 
+                 (touchstart)="$event.stopPropagation()"
+                 (pointerdown)="$event.stopPropagation()">
               
               @if (!showManualInputs()) {
                 <div class="time-range-text clickable-time" 
@@ -177,22 +172,19 @@
             </div>
           </div>
 
-          <!-- Horas en base al círculo (ej. 7 hrs) -->
           <div class="register-hours-result">
-            <span class="res-value" [style.color]="tempHoras() >= 8 ? '#DCA038' : '#68B0E8'">
+            <span class="res-value" [style.color]="tempHoras() >= 8 ? '#DCA038' : (state.modoNoche() ? '#D94E34' : '#68B0E8')">
               {{ tempHoras() }} hrs {{ tempMinutos() > 0 ? tempMinutos() + ' mins' : '' }}
             </span>
           </div>
 
-          <!-- Mensaje de Advertencia (> 10 horas) -->
           @if (warningMessage()) {
             <div class="health-warning-msg">
-              ⚠️ {{ warningMessage() }}
+              {{ warningMessage() }}
             </div>
           }
         </div>
 
-        <!-- Botones inferiores Cancelar / Guardar -->
         <div class="register-actions">
           <button class="btn-action cancel" (click)="cancelarRegistro()">Cancelar</button>
           <button class="btn-action save" (click)="guardarRegistro()">Guardar</button>
