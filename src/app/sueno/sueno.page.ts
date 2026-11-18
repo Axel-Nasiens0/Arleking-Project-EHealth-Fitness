@@ -65,7 +65,6 @@ export class SuenoPage {
 
   viewMode = signal<'dashboard' | 'register'>('dashboard');
 
-  // Índice del día actual (0 = Lunes, 1 = Martes, ..., 6 = Domingo)
   hoyIndex: number = this.obtenerIndiceDiaHoy();
   selectedDayKey = this.obtenerClaveDiaHoy();
   fechaActual: string = this.obtenerFechaActualFormateada();
@@ -96,7 +95,7 @@ export class SuenoPage {
   }
 
   private obtenerIndiceDiaHoy(): number {
-    const jsDay = new Date().getDay(); // 0 = Domingo, 1 = Lunes...
+    const jsDay = new Date().getDay();
     return jsDay === 0 ? 6 : jsDay - 1;
   }
 
@@ -210,7 +209,6 @@ export class SuenoPage {
     this.semana.set(nuevaSemana);
     this.guardarSemanaLocal(nuevaSemana);
 
-    // Sincronizar con el Dashboard principal (folder) si se registró el día de hoy
     if (this.esDiaHoy(this.selectedDayKey)) {
       const totalHorasDecimal = Number((h + m / 60).toFixed(1));
       this.state.horasSueno.set(totalHorasDecimal);
@@ -297,26 +295,24 @@ export class SuenoPage {
 
     let deg = rad * (180 / Math.PI);
 
-    const horasActuales = this.tempHoras();
-    if (horasActuales >= 8 && (deg < 90 || deg > 270)) {
-      deg = 360;
-    }
-
     this.actualizarValoresPorAngulo(deg);
   }
 
   actualizarValoresPorAngulo(deg: number) {
     const maxMinutes = 10 * 60;
-    const horasActuales = this.tempHoras();
+    const horasPrevias = this.tempHoras();
 
-    let degLimitado = deg;
-    if (horasActuales >= 8 && deg < 180) {
-      degLimitado = 360;
-    } else if (deg > 360 || (horasActuales >= 9 && deg < 270)) {
-      degLimitado = 360;
+    // FILTRO DE TOPE SUAVE: 
+    // Si el usuario ya estaba en 10 horas y da un tirón brusco cruzando el origen (0°/360°),
+    // determinamos si está intentando rebasar hacia adelante o regresar.
+    let degAjustado = deg;
+    if (horasHorasCercaDelTope(horasPrevias, deg)) {
+      if (deg < 90 && horasPrevias >= 9) {
+        degAjustado = 360; // Se mantiene al tope de 10 horas si sigue empujando hacia adelante
+      }
     }
 
-    const gradosFinales = Math.min(Math.max(degLimitado, 0), 360);
+    const gradosFinales = Math.min(Math.max(degAjustado, 0), 360);
     const rawTotalMinutes = Math.round((gradosFinales / 360) * maxMinutes);
 
     if (rawTotalMinutes >= maxMinutes || gradosFinales >= 360) {
@@ -371,4 +367,9 @@ export class SuenoPage {
     await popover.dismiss();
     this.router.navigateByUrl('/metas');
   }
+}
+
+// Función auxiliar para validar si está al límite superior
+function horasHorasCercaDelTope(horasPrevias: number, deg: number): boolean {
+  return horasPrevias >= 9 && (deg < 30 || deg > 330);
 }
