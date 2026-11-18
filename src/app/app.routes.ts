@@ -17,4 +17,8 @@ export const routes: Routes = [
     path: 'sueno',
     loadComponent: () => import('./sueno/sueno.page').then((m) => m.SuenoPage),
   },
+  {
+    path: 'grafica',
+    loadComponent: () => import('./grafica/grafica.page').then((m) => m.GraficaPage),
+  },
 ];

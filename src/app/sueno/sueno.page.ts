@@ -67,7 +67,7 @@ export class SuenoPage {
 
   hoyIndex: number = this.obtenerIndiceDiaHoy();
   selectedDayKey = this.obtenerClaveDiaHoy();
-  fechaActual: string = this.obtenerFechaActualFormateada();
+  fechaActual: string = this.formatearFecha();
 
   semana = signal<DiaProgreso[]>(this.cargarSemanaLocal());
 
@@ -104,6 +104,16 @@ export class SuenoPage {
     return claves[this.obtenerIndiceDiaHoy()];
   }
 
+  private obtenerFechaDeDiaSemana(key: string): Date {
+    const claves = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado', 'domingo'];
+    const targetIdx = claves.indexOf(key);
+    const hoy = new Date();
+    const diffDias = targetIdx - this.hoyIndex;
+    const fechaObjetivo = new Date(hoy);
+    fechaObjetivo.setDate(hoy.getDate() + diffDias);
+    return fechaObjetivo;
+  }
+
   private crearSemanaInicial(): DiaProgreso[] {
     return [
       { key: 'lunes', dia: 'L', porcentaje: 0, horas: 0, minutos: 0, rango: '', registrado: false },
@@ -118,20 +128,30 @@ export class SuenoPage {
 
   private cargarSemanaLocal(): DiaProgreso[] {
     const correo = this.state.usuario()?.correo || 'default';
-    const raw = localStorage.getItem(`arleking_sueno_${correo}`);
-    return raw ? JSON.parse(raw) : this.crearSemanaInicial();
+    const semanaId = this.state.obtenerSemanaId();
+    const raw = localStorage.getItem(`arleking_sueno_${correo}_${semanaId}`);
+    const lista: DiaProgreso[] = raw ? JSON.parse(raw) : this.crearSemanaInicial();
+
+    // Sincronizar el valor de hoy con el estado global y el historial si ya estaba registrado
+    const hoyItem = lista.find(d => d.key === this.obtenerClaveDiaHoy());
+    if (hoyItem && hoyItem.registrado) {
+      const totalHorasDecimal = Number((hoyItem.horas + hoyItem.minutos / 60).toFixed(1));
+      this.state.horasSueno.set(totalHorasDecimal);
+    }
+
+    return lista;
   }
 
   private guardarSemanaLocal(lista: DiaProgreso[]) {
     const correo = this.state.usuario()?.correo || 'default';
-    localStorage.setItem(`arleking_sueno_${correo}`, JSON.stringify(lista));
+    const semanaId = this.state.obtenerSemanaId();
+    localStorage.setItem(`arleking_sueno_${correo}_${semanaId}`, JSON.stringify(lista));
   }
 
-  obtenerFechaActualFormateada(): string {
-    const hoy = new Date();
-    const dia = hoy.getDate();
+  formatearFecha(fecha: Date = new Date()): string {
+    const dia = fecha.getDate();
     const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-    return `${dia} / ${meses[hoy.getMonth()]} / ${hoy.getFullYear()}`;
+    return `${dia} / ${meses[fecha.getMonth()]} / ${fecha.getFullYear()}`;
   }
 
   esDiaFuturo(index: number): boolean {
@@ -156,6 +176,8 @@ export class SuenoPage {
       return;
     }
     this.selectedDayKey = d.key;
+    const fechaDelDia = this.obtenerFechaDeDiaSemana(d.key);
+    this.fechaActual = this.formatearFecha(fechaDelDia);
   }
 
   getDiaSeleccionado(): DiaProgreso {
@@ -191,6 +213,7 @@ export class SuenoPage {
 
     const porc = this.tempPorcentaje();
     const rangoStr = `${this.tempHoraInicio()} - ${this.tempHoraFin()}`;
+    const totalHorasDecimal = Number((h + m / 60).toFixed(1));
 
     const nuevaSemana = this.semana().map(d => {
       if (d.key === this.selectedDayKey) {
@@ -209,8 +232,15 @@ export class SuenoPage {
     this.semana.set(nuevaSemana);
     this.guardarSemanaLocal(nuevaSemana);
 
+    // Guardar en el historial unificado (para gráficas Día / Mes / Año y BD)
+    const fechaDelRegistro = this.obtenerFechaDeDiaSemana(this.selectedDayKey);
+    this.state.guardarMetricaEnHistorial(fechaDelRegistro, {
+      horasSueno: totalHorasDecimal,
+      rangoSueno: rangoStr
+    });
+
+    // Sincronizar con el Dashboard principal (folder) si se registró el día de hoy
     if (this.esDiaHoy(this.selectedDayKey)) {
-      const totalHorasDecimal = Number((h + m / 60).toFixed(1));
       this.state.horasSueno.set(totalHorasDecimal);
     }
 
@@ -302,7 +332,7 @@ export class SuenoPage {
     const maxMinutes = 10 * 60;
     const horasPrevias = this.tempHoras();
 
-    // FILTRO DE TOPE SUAVE: 
+    // FILTRO DE TOPE SUAVE:
     // Si el usuario ya estaba en 10 horas y da un tirón brusco cruzando el origen (0°/360°),
     // determinamos si está intentando rebasar hacia adelante o regresar.
     let degAjustado = deg;

@@ -15,11 +15,20 @@ export class SplashScreenPage implements OnInit {
   private router = inject(Router);
   private state = inject(ArlekingStateService);
 
+  private esComputadora(): boolean {
+    const anchoEscritorio = window.innerWidth >= 768;
+    const esMovil = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    return anchoEscritorio && !esMovil;
+  }
+
   ngOnInit() {
     setTimeout(() => {
-      // Si ya inició sesión antes en este teléfono, entra directo a /folder; si no, va a /login
-      const destino = this.state.estaAutenticado() ? '/folder' : '/login';
-      this.router.navigateByUrl(destino, { replaceUrl: true });
+      if (this.state.estaAutenticado()) {
+        const destino = this.esComputadora() ? '/grafica' : '/folder';
+        this.router.navigateByUrl(destino, { replaceUrl: true });
+      } else {
+        this.router.navigateByUrl('/login', { replaceUrl: true });
+      }
     }, 3000);
   }
 }

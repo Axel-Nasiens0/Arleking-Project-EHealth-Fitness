@@ -1,0 +1,165 @@
+.main-toolbar {
+  --background: var(--arle-card-bg);
+  --border-width: 0;
+
+  .app-title {
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--arle-text-main);
+    text-align: center;
+    font-size: 1.05rem;
+  }
+
+  .icon-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.4rem;
+    color: var(--arle-text-main);
+    padding: 8px;
+    cursor: pointer;
+  }
+}
+
+.graficos-content {
+  --background: var(--arle-bg);
+}
+
+.analytics-wrapper {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 20px 18px 36px;
+}
+
+/* Switch Superior (Día | Mes | Año) */
+.period-switch-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+
+  .period-switch {
+    display: inline-flex;
+    background: var(--arle-card-bg);
+    padding: 6px;
+    border-radius: 30px;
+    box-shadow: var(--arle-shadow);
+    gap: 6px;
+
+    .switch-btn {
+      border: none;
+      background: transparent;
+      color: var(--arle-text-sub);
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 10px 28px;
+      border-radius: 24px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+
+      &.active {
+        background: #26C6DA;
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(38, 198, 218, 0.35);
+      }
+    }
+  }
+}
+
+/* Grid de Tarjetas (2 columnas en escritorio, 1 en pantalla estrecha) */
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 18px;
+}
+
+.card-container.chart-card {
+  background: var(--arle-card-bg);
+  border-radius: 32px;
+  padding: 22px 24px;
+  box-shadow: var(--arle-shadow);
+  transition: background-color 0.3s ease;
+
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 12px;
+
+    .chart-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      .icon-badge {
+        width: 44px;
+        height: 44px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.35rem;
+      }
+
+      .chart-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 800;
+        color: var(--arle-text-main);
+      }
+
+      .chart-subtitle {
+        font-size: 0.78rem;
+        color: var(--arle-text-sub);
+        font-weight: 500;
+      }
+    }
+
+    .chart-main-value {
+      font-size: 1.05rem;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+  }
+
+  /* Área de barras verticales */
+  .bars-area {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 8px;
+    height: 145px;
+    padding-top: 8px;
+
+    .bar-column {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+
+      .bar-track {
+        width: 100%;
+        max-width: 24px;
+        height: 115px;
+        border-radius: 12px;
+        display: flex;
+        align-items: flex-end;
+        overflow: hidden;
+
+        .bar-fill {
+          width: 100%;
+          border-radius: 12px;
+          transition: height 0.35s ease;
+        }
+      }
+
+      .bar-label {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: var(--arle-text-sub);
+      }
+    }
+  }
+}
