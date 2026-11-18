@@ -37,7 +37,7 @@ export class ArlekingStateService {
     // Todo inicia en 0 hasta que haya actividad real
     pasosActuales = signal<number>(0);
     pasosHistoricos = signal<number>(0);
-    pasosMetaDiaria = signal<number>(16000);
+    pasosMetaDiaria = signal<number>(6000);
     tiempoActivoMins = signal<number>(0);
     pasosPorFranja = signal<number[]>([0, 0, 0, 0, 0]);
     diasSemana = signal<DiaSemanaRegistro[]>(this.crearSemanaVacia());
