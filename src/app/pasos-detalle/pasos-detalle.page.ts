@@ -49,7 +49,7 @@ export class PasosDetallePage implements OnInit, AfterViewInit {
     this.map = L.map('real-leaflet-map', { zoomControl: false }).setView([defaultLat, defaultLng], 15);
 
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-      maxZoom: 19
+      maxZoom: 18
     }).addTo(this.map);
 
     setTimeout(() => this.map.invalidateSize(), 300);
