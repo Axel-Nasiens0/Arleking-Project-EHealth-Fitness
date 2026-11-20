@@ -76,6 +76,11 @@ export class FolderPage implements OnInit {
     this.router.navigateByUrl('/sueno');
   }
 
+  irACorazon() {
+    this.quitarFocoActivo();
+    this.router.navigateByUrl('/corazon');
+  }
+
   async cerrarSesion(popover: IonPopover) {
     this.quitarFocoActivo();
     await popover.dismiss();

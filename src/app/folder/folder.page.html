@@ -89,7 +89,7 @@
     </div>
 
     <!-- Tarjeta Ritmo Cardíaco -->
-    <div class="card-container widget-card">
+    <div class="card-container widget-card" (click)="irACorazon()">
       <div class="widget-info">
         <span class="widget-title">Ritmo Cardíaco</span>
         <span class="widget-subtitle">{{ state.ritmoCardiaco() ?? '--' }} LPM</span>

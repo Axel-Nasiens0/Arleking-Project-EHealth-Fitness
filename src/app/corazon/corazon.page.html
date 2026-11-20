@@ -1,0 +1,289 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      @if (pantalla() === 'inicial') {
+        <ion-back-button defaultHref="/folder" icon="chevron-back-outline"></ion-back-button>
+      } @else {
+        <ion-button (click)="volverAlInicio()">
+          <ion-icon name="chevron-back-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      }
+    </ion-buttons>
+
+    <ion-title class="ion-text-center">ARLEKING</ion-title>
+
+    <ion-buttons slot="end">
+      <button class="icon-btn" id="menu-tres-puntos-corazon">
+        <ion-icon name="ellipsis-vertical"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-popover #menuPopover trigger="menu-tres-puntos-corazon" triggerAction="click">
+  <ng-template>
+    <ion-list lines="none">
+      <ion-item>
+        <ion-icon slot="start" [name]="state.modoNoche() ? 'sunny-outline' : 'moon-outline'"></ion-icon>
+        <ion-label>{{ state.modoNoche() ? 'Modo Claro' : 'Modo Noche' }}</ion-label>
+        <ion-toggle
+          slot="end"
+          [checked]="state.modoNoche()"
+          (ionChange)="state.setModoNoche($event.detail.checked)">
+        </ion-toggle>
+      </ion-item>
+
+      <ion-item button (click)="irAMetas(menuPopover)">
+        <ion-icon slot="start" name="trophy-outline" style="color: #D4AF37;"></ion-icon>
+        <ion-label>Mis Metas</ion-label>
+      </ion-item>
+
+      <ion-item button (click)="cerrarSesion(menuPopover)">
+        <ion-icon slot="start" name="log-out-outline" color="danger"></ion-icon>
+        <ion-label color="danger">Cerrar Sesión</ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-template>
+</ion-popover>
+
+<ion-content>
+
+  @if (pantalla() === 'inicial') {
+    <div class="page-wrapper">
+      
+      @if (corazonService.historial().length === 0) {
+        <div class="top-section">
+          <div class="avatar-yellow">
+            <ion-icon name="heart-outline"></ion-icon>
+          </div>
+          <h2 class="welcome-title">Ritmo cardíaco</h2>
+          <p class="welcome-sub">Mide tu pulso usando el lector de huella digital de tu teléfono</p>
+        </div>
+
+        <div class="middle-section">
+          <div class="card-measure">
+            <p class="lpm-placeholder">__ LPM</p>
+            <div class="bar-pill"></div>
+            <div class="bar-labels">
+              <span>40</span>
+              <span>220</span>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="history-container">
+          
+          <div
+            class="featured-card"
+            tabindex="0"
+            (click)="verDetalleHistorial(corazonService.historial()[0])"
+            (keyup.enter)="verDetalleHistorial(corazonService.historial()[0])">
+            <div class="featured-top">
+              <span class="featured-date">{{ corazonService.historial()[0].fecha }}</span>
+              <span class="status-pill" [class.alerta]="corazonService.historial()[0].estado !== 'En rango'">
+                <span class="dot"></span> {{ corazonService.historial()[0].estado }}
+              </span>
+            </div>
+
+            <div class="featured-bpm-row">
+              <span class="big-bpm">{{ corazonService.historial()[0].lpm }}</span>
+              <div class="bpm-unit-stack">
+                <ion-icon name="heart" class="mini-heart"></ion-icon>
+                <span>LPM</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="history-list-header">
+            <span>Registros anteriores</span>
+            <button type="button" class="btn-clear" (click)="limpiarHistorial()">
+              <ion-icon name="trash-outline"></ion-icon> Limpiar
+            </button>
+          </div>
+
+          <div class="history-cards">
+            @for (item of corazonService.historial(); track item.id) {
+              <div
+                class="history-row-card"
+                tabindex="0"
+                (click)="verDetalleHistorial(item)"
+                (keyup.enter)="verDetalleHistorial(item)">
+                <div class="row-top-date">{{ item.fechaCorta }}</div>
+                <div class="row-main">
+                  <div class="row-bpm-box">
+                    <span class="row-bpm-num">{{ item.lpm }}</span>
+                    <span class="row-bpm-lbl">LPM</span>
+                  </div>
+
+                  <div class="row-status-bar" [class.alerta]="item.estado !== 'En rango'"></div>
+
+                  <div class="row-details">
+                    <div class="row-estado">{{ item.estado }}</div>
+                    <div class="row-submetrics">Frecuencia en reposo</div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+
+      <div class="bottom-section">
+        <ion-button class="btn-yellow" expand="block" (click)="iniciarMedicion()">
+          Medir
+        </ion-button>
+      </div>
+    </div>
+  }
+
+  @if (pantalla() === 'midiendo') {
+    <div class="page-wrapper scan-layout">
+      
+      <div class="scan-top-section">
+        <div class="heart-visual" [class.latiendo]="huellaDetectada()">
+          <ion-icon name="heart"></ion-icon>
+        </div>
+
+        <h2 class="scan-title">
+          @if (huellaDetectada()) {
+            Detectando tu pulso...
+          } @else {
+            Mide tu LPM
+          }
+        </h2>
+
+        @if (medicionCancelada() && !huellaDetectada()) {
+          <p class="cancel-warning">Se retiró la huella. Vuelve a colocar el dedo para repetir.</p>
+        }
+      </div>
+
+      <div class="scan-middle-section">
+        @if (huellaDetectada()) {
+          <div class="ecg-live-box">
+            <div class="ecg-live-track">
+              <svg viewBox="0 0 300 60" preserveAspectRatio="none">
+                <path d="M0,30 L40,30 L50,10 L60,50 L70,20 L80,40 L90,30 L150,30 L160,6 L170,54 L180,15 L190,45 L200,30 L300,30"
+                      stroke="#d4af37" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <svg viewBox="0 0 300 60" preserveAspectRatio="none">
+                <path d="M0,30 L40,30 L50,10 L60,50 L70,20 L80,40 L90,30 L150,30 L160,6 L170,54 L180,15 L190,45 L200,30 L300,30"
+                      stroke="#d4af37" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </div>
+
+          <div class="progress-wrapper">
+            <div class="progress-fill" [style.width.%]="progreso()"></div>
+          </div>
+          <span class="progress-time">Capturando pulso... {{ segundosRestantes() }}s</span>
+        } @else {
+          <div class="red-flat-line"></div>
+        }
+
+        <div class="live-lpm-counter">
+          <span class="live-num">{{ lpmFormateado() }}</span>
+          <span class="live-unit">LPM</span>
+        </div>
+      </div>
+
+      <div 
+        class="bottom-card fingerprint-card"
+        (touchstart)="iniciarHuella($event)"
+        (touchend)="soltarHuella()"
+        (touchcancel)="soltarHuella()"
+        (mousedown)="iniciarHuella($event)"
+        (mouseup)="soltarHuella()"
+        (mouseleave)="soltarHuella()">
+        
+        <div class="fingerprint-ring" [class.escaneando]="huellaDetectada()">
+          <ion-icon name="finger-print-outline" class="fingerprint-icon"></ion-icon>
+        </div>
+
+        <p class="guide-title">
+          @if (huellaDetectada()) {
+            Mantén tu huella en el lector...
+          } @else {
+            Coloca tu huella digital en el lector
+          }
+        </p>
+      </div>
+
+    </div>
+  }
+
+  @if (pantalla() === 'resultado' && registroActual(); as actual) {
+    <div class="page-wrapper result-layout">
+
+      <div class="result-meta-bar">
+        <span class="result-timestamp">{{ actual.fechaCorta }}</span>
+        <button type="button" class="btn-retest" (click)="iniciarMedicion()">
+          <ion-icon name="refresh-outline"></ion-icon> Medir otra vez
+        </button>
+      </div>
+
+      <div class="result-hero">
+        <span class="hero-subtitle">Ritmo cardíaco</span>
+        <div class="hero-bpm-row">
+          <span class="hero-bpm-value">{{ actual.lpm }}</span>
+          <div class="hero-bpm-unit">
+            <ion-icon name="heart" class="hero-heart"></ion-icon>
+            <span>LPM</span>
+          </div>
+        </div>
+
+        <svg class="ecg-line" viewBox="0 0 300 50">
+          <path class="ecg-draw" d="M0,25 L55,25 L65,8 L75,42 L85,16 L95,34 L105,25 L155,25 L165,4 L175,46 L185,12 L195,38 L205,25 L300,25" 
+                stroke="#d4af37" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+
+      <div class="diagnosis-card">
+        <div class="diag-header">
+          Ritmo cardíaco: <strong>{{ actual.lpm }} LPM</strong>
+        </div>
+
+        <h3 class="diag-status" [class.alerta]="actual.estado !== 'En rango'">
+          {{ actual.estado }}
+        </h3>
+
+        <div class="range-bar-wrapper">
+          <div class="range-pointer" [style.left.%]="posicionIndicadorRango()">▼</div>
+          <div class="range-segments">
+            <div class="seg seg-bajo"></div>
+            <div class="seg seg-normal"></div>
+            <div class="seg seg-alto"></div>
+          </div>
+          <div class="range-ticks">
+            <span>40</span>
+            <span>60</span>
+            <span>100</span>
+            <span>160</span>
+          </div>
+        </div>
+
+        @if (actual.estado === 'En rango') {
+          <p class="diag-text">
+            Tu ritmo cardíaco en reposo es de <strong>{{ actual.lpm }} LPM</strong>, dentro del rango de referencia de 60–100 LPM para adultos. Mantén tus hábitos saludables y mídelo con regularidad.
+          </p>
+        } @else if (actual.estado === 'Bajo') {
+          <p class="diag-text">
+            Tu ritmo cardíaco es de <strong>{{ actual.lpm }} LPM</strong> (por debajo de 60 LPM). Si no eres atleta de alto rendimiento y sientes mareos o fatiga, consulta a un médico.
+          </p>
+        } @else {
+          <p class="diag-text">
+            Tu ritmo cardíaco es de <strong>{{ actual.lpm }} LPM</strong> (por encima de 100 LPM). Descansa unos minutos y vuelve a medir; si persiste acompañado de malestar, busca atención médica.
+          </p>
+        }
+      </div>
+
+      <div class="bottom-section">
+        <ion-button class="btn-save" expand="block" (click)="volverAlInicio()">
+          Guardar y ver historial
+        </ion-button>
+      </div>
+
+    </div>
+  }
+
+</ion-content>
