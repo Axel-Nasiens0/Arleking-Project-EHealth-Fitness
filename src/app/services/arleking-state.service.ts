@@ -179,8 +179,7 @@ export class ArlekingStateService {
     const esMismaSemana = user.ultimaSemanaId === semanaActualId;
 
     this.pasosHistoricos.set(user.pasosHistoricos || 0);
-    const metaValida = (!user.metaDiaria || user.metaDiaria === 16000) ? 6000 : user.metaDiaria;
-    this.pasosMetaDiaria.set(metaValida);
+    this.pasosMetaDiaria.set(user.metaDiaria || 6000);
 
     this.pasosActuales.set(esMismoDia ? (user.pasosHoy || 0) : 0);
     this.tiempoActivoMins.set(esMismoDia ? (user.tiempoHoy || 0) : 0);
