@@ -15,6 +15,7 @@
     font-size: 1.4rem;
     color: var(--arle-text-main);
     padding: 8px;
+    cursor: pointer;
   }
 }
 
@@ -22,6 +23,7 @@
   --background: var(--arle-bg);
   --padding-start: 16px;
   --padding-end: 16px;
+  --padding-bottom: 24px;
 
   .card-container {
     background: var(--arle-card-bg);
@@ -29,7 +31,7 @@
     padding: 20px 24px;
     margin-bottom: 14px;
     box-shadow: var(--arle-shadow);
-    transition: background-color 0.3s ease;
+    transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.2s ease;
   }
 
   /* 1. Tarjeta Principal de la Lanza */
@@ -82,7 +84,6 @@
         width: 80px;
         height: 180px;
 
-        /* Estado Inicial Vacío (Sin datos) */
         .sword-blade,
         .sword-guard,
         .sword-handle {
@@ -98,7 +99,6 @@
           transition: fill 0.3s ease;
         }
 
-        /* Estados Activos al registrar movimiento */
         .active-cyan { stroke: #26C6DA; }
         .active-pink { stroke: #E91E63; }
         .active-purple { stroke: #7E57C2; }
@@ -106,7 +106,6 @@
       }
     }
 
-    /* Estado Dorado (Meta alcanzada) */
     &.golden-goal {
       .sword-legend .dot { background-color: #D4AF37 !important; }
       .arleking-sword-svg {
@@ -116,12 +115,11 @@
     }
   }
 
-  /* 2. Lista Vertical de Tarjetas de Monitoreo */
+  /* 2. Lista Vertical de Tarjetas con formato uniforme */
   .cards-stack {
     display: flex;
     flex-direction: column;
     gap: 14px;
-    cursor: pointer;
 
     .widget-card {
       display: flex;
@@ -129,11 +127,30 @@
       align-items: center;
       padding: 18px 24px;
       margin-bottom: 0;
+      cursor: pointer;
 
       .widget-info {
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        gap: 3px;
+        text-align: left;
+
+        .widget-title-row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .widget-icon {
+          font-size: 1.2rem;
+          flex-shrink: 0;
+          transition: transform 0.2s ease;
+
+          &.icon-steps { color: #26C6DA; }
+          &.icon-heart { color: #ecd188; }
+          &.icon-sleep { color: #d94e34; }
+          &.graficas-icon { color: #26C6DA; }
+        }
 
         .widget-title {
           font-size: 0.95rem;
@@ -148,10 +165,21 @@
         }
       }
 
-      /* Barra de Progreso de Pasos (Fondo Cyan Claro -> Relleno Cyan Intenso) */
+      .widget-right-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .card-chevron {
+        font-size: 1.25rem;
+        color: var(--arle-text-sub);
+        flex-shrink: 0;
+      }
+
       .steps-progress-bar {
-        width: 140px;
-        height: 22px;
+        width: 95px;
+        height: 18px;
         background-color: #d6f4f8;
         border-radius: 12px;
         overflow: hidden;
@@ -165,32 +193,19 @@
         }
       }
 
-      /* Botón Dorado Circular (Ritmo Cardíaco) */
-      .heart-action-btn {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
+      .heart-pill {
         background-color: #ecd188;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        border: none;
-        cursor: pointer;
-
-        span {
-          font-size: 0.5rem;
-          font-weight: 700;
-          color: #4a3b10;
-          text-align: center;
-          line-height: 1;
-        }
+        color: #4a3b10;
+        font-size: 0.72rem;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 999px;
+        white-space: nowrap;
       }
 
-      /* Barra Horizontal Sueño (Fondo Coral Claro -> Relleno Rojo Intenso) */
       .sleep-progress-bar {
-        width: 140px;
-        height: 22px;
+        width: 95px;
+        height: 18px;
         background-color: #fde4dd;
         border-radius: 12px;
         overflow: hidden;
@@ -202,6 +217,42 @@
           border-radius: 12px;
           transition: width 0.3s ease;
         }
+      }
+    }
+
+    .nav-style-card {
+      width: 100%;
+
+      &.steps-card {
+        border: 1px solid rgba(38, 198, 218, 0.25);
+        &:hover { border-color: #26C6DA; }
+      }
+
+      &.heart-card {
+        border: 1px solid rgba(236, 209, 136, 0.32);
+        &:hover { border-color: #ecd188; }
+      }
+
+      &.sleep-card {
+        border: 1px solid rgba(217, 78, 52, 0.28);
+        &:hover { border-color: #d94e34; }
+      }
+
+      &.graficas-nav-card {
+        border: 1px solid rgba(38, 198, 218, 0.25);
+        &:hover { border-color: #26C6DA; }
+      }
+
+      &:hover {
+        transform: translateY(-1px);
+
+        .widget-icon {
+          transform: scale(1.08);
+        }
+      }
+
+      &:active {
+        transform: scale(0.99);
       }
     }
   }

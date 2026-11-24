@@ -1,34 +1,140 @@
 <ion-content class="login-content">
   <div class="login-wrapper">
-    <!-- Logo de Arleking Fitness guardado en src/assets/logo.png -->
-    <img src="assets/icon/logo.png" alt="Arleking Fitness" class="login-logo" />
-    
-    <h1>ARLEKING</h1>
-    <p class="subtitle">Inicia sesión para guardar o recuperar tus récords</p>
+    <div class="login-shell">
+      <!-- Encabezado de marca -->
+      <div class="brand-header">
+        <div class="logo-ring">
+          <img src="assets/icon/logo.png" alt="Arleking Fitness" class="login-logo" />
+        </div>
+        <h1>ARLEKING</h1>
+        <p class="subtitle">
+          {{ modo === 'login'
+            ? 'Inicia sesión para guardar o recuperar tus récords'
+            : 'Crea tu perfil con tu nombre o apodo, correo y contraseña' }}
+        </p>
+      </div>
 
-    <div class="form-card">
-      <ion-input
-        label="Nombre o Apodo"
-        labelPlacement="floating"
-        fill="outline"
-        [(ngModel)]="nombre"
-        placeholder="Ej. Arleking Runner">
-      </ion-input>
+      <!-- Selector de pestaña: Iniciar Sesión / Registrarse -->
+      <div class="mode-switcher" role="tablist" aria-label="Modo de acceso">
+        <button
+          type="button"
+          class="mode-btn"
+          [class.active]="modo === 'login'"
+          (click)="cambiarModo('login')">
+          Iniciar Sesión
+        </button>
+        <button
+          type="button"
+          class="mode-btn"
+          [class.active]="modo === 'registro'"
+          (click)="cambiarModo('registro')">
+          Registrarse
+        </button>
+      </div>
 
-      <ion-input
-        label="Correo Electrónico"
-        labelPlacement="floating"
-        fill="outline"
-        type="email"
-        [(ngModel)]="correo"
-        placeholder="usuario@correo.com">
-      </ion-input>
+      <!-- Tarjeta del formulario -->
+      <div class="form-card">
+        <div class="form-card-top">
+          <span class="form-badge">
+            {{ modo === 'login' ? 'Acceso rápido' : 'Nuevo perfil' }}
+          </span>
+          <span class="form-hint">
+            {{ modo === 'login'
+              ? (metodoLogin === 'correo' ? 'Correo y contraseña' : 'Usuario y contraseña')
+              : 'Nombre, correo y contraseña' }}
+          </span>
+        </div>
 
-      <p class="error-msg" *ngIf="errorMsg">{{ errorMsg }}</p>
+        @if (modo === 'registro') {
+          <ion-input
+            class="arle-input"
+            label="Nombre o Apodo"
+            labelPlacement="floating"
+            fill="outline"
+            [(ngModel)]="nombre"
+            placeholder="Ej. Arleking Runner">
+          </ion-input>
 
-      <ion-button expand="block" shape="round" class="start-btn" (click)="entrar()">
-        Continuar
-      </ion-button>
+          <ion-input
+            class="arle-input"
+            label="Correo Electrónico"
+            labelPlacement="floating"
+            fill="outline"
+            type="email"
+            [(ngModel)]="correo"
+            placeholder="usuario@correo.com">
+          </ion-input>
+        } @else {
+          <!-- Switch tipo píldora: Correo / Nombre de usuario -->
+          <div class="login-method-switcher" role="tablist" aria-label="Identificador de inicio de sesión">
+            <button
+              type="button"
+              class="method-btn"
+              [class.active]="metodoLogin === 'correo'"
+              (click)="cambiarMetodoLogin('correo')">
+              Correo
+            </button>
+            <button
+              type="button"
+              class="method-btn"
+              [class.active]="metodoLogin === 'usuario'"
+              (click)="cambiarMetodoLogin('usuario')">
+              Nombre de usuario
+            </button>
+          </div>
+
+          @if (metodoLogin === 'correo') {
+            <ion-input
+              class="arle-input"
+              label="Correo Electrónico"
+              labelPlacement="floating"
+              fill="outline"
+              type="email"
+              [(ngModel)]="correo"
+              placeholder="usuario@correo.com">
+            </ion-input>
+          } @else {
+            <ion-input
+              class="arle-input"
+              label="Nombre de usuario"
+              labelPlacement="floating"
+              fill="outline"
+              [(ngModel)]="nombre"
+              placeholder="Ej. Arleking Runner">
+            </ion-input>
+          }
+        }
+
+        <ion-input
+          class="arle-input"
+          label="Contraseña"
+          labelPlacement="floating"
+          fill="outline"
+          [type]="mostrarPassword ? 'text' : 'password'"
+          [(ngModel)]="password"
+          placeholder="Ingresa tu contraseña">
+          <button
+            slot="end"
+            type="button"
+            class="password-toggle-btn"
+            (click)="toggleMostrarPassword()"
+            [attr.aria-label]="mostrarPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+            <ion-icon [name]="mostrarPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          </button>
+        </ion-input>
+
+        @if (errorMsg) {
+          <p class="error-msg">{{ errorMsg }}</p>
+        }
+
+        <ion-button expand="block" shape="round" class="start-btn" [disabled]="cargando" (click)="entrar()">
+          {{ modo === 'login' ? 'Iniciar Sesión' : 'Crear Cuenta y Continuar' }}
+        </ion-button>
+
+        <div class="form-footer-note">
+          <span>Pasos · Ritmo cardíaco · Sueño · Analítica</span>
+        </div>
+      </div>
     </div>
   </div>
 </ion-content>

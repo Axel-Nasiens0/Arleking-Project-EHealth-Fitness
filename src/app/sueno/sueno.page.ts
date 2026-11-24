@@ -22,7 +22,8 @@ import {
   chevronBackOutline,
   trophyOutline,
   moonOutline,
-  sunnyOutline
+  sunnyOutline,
+  bedOutline
 } from 'ionicons/icons';
 import { ArlekingStateService } from '../services/arleking-state.service';
 
@@ -90,7 +91,8 @@ export class SuenoPage {
       chevronBackOutline,
       trophyOutline,
       moonOutline,
-      sunnyOutline
+      sunnyOutline,
+      bedOutline
     });
   }
 

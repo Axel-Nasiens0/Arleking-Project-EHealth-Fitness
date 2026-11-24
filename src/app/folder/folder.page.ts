@@ -15,7 +15,18 @@ import {
   IonToggle
 } from '@ionic/angular';
 import { addIcons } from 'ionicons';
-import { ellipsisVertical, trophyOutline, moonOutline, sunnyOutline, logOutOutline } from 'ionicons/icons';
+import {
+  ellipsisVertical,
+  trophyOutline,
+  moonOutline,
+  sunnyOutline,
+  logOutOutline,
+  barChartOutline,
+  chevronForwardOutline,
+  footstepsOutline,
+  heartOutline,
+  bedOutline
+} from 'ionicons/icons';
 import { ArlekingStateService } from '../services/arleking-state.service';
 
 @Component({
@@ -43,7 +54,18 @@ export class FolderPage implements OnInit {
   public state = inject(ArlekingStateService);
 
   constructor() {
-    addIcons({ ellipsisVertical, trophyOutline, moonOutline, sunnyOutline, logOutOutline });
+    addIcons({
+      ellipsisVertical,
+      trophyOutline,
+      logOutOutline,
+      barChartOutline,
+      chevronForwardOutline,
+      footstepsOutline,
+      heartOutline,
+      bedOutline,
+      moonOutline,
+      sunnyOutline
+    });
   }
 
   ngOnInit() {
@@ -79,6 +101,11 @@ export class FolderPage implements OnInit {
   irACorazon() {
     this.quitarFocoActivo();
     this.router.navigateByUrl('/corazon');
+  }
+
+  irAGraficas() {
+    this.quitarFocoActivo();
+    this.router.navigateByUrl('/grafica');
   }
 
   async cerrarSesion(popover: IonPopover) {

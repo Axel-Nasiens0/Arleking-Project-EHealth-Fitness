@@ -2,7 +2,7 @@
   <ion-toolbar class="custom-toolbar">
     <ion-buttons slot="start">
       @if (viewMode() === 'dashboard') {
-        <ion-back-button defaultHref="/folder" text="" icon="chevron-back-outline"></ion-back-button>
+        <ion-back-button class="icon-btn" defaultHref="/folder" text="" icon="chevron-back-outline"></ion-back-button>
       } @else {
         <button class="icon-btn" (click)="cancelarRegistro()">
           <ion-icon name="chevron-back-outline"></ion-icon>
@@ -44,69 +44,94 @@
 
     <!-- ================= VISTA 1: DASHBOARD PRINCIPAL ================= -->
     @if (viewMode() === 'dashboard') {
-      <!-- Selector Semanal (L, M, M, J, V, S, D) -->
-      <div class="weekly-container">
-        @for (d of semana(); track d.key; let i = $index) {
-          <div
-            class="day-card"
-            [class.selected]="d.key === selectedDayKey"
-            [class.locked-day]="esDiaFuturo(i)"
-            (click)="seleccionarDia(d, i)">
-            <span class="day-label">{{ d.dia }}</span>
-            <div class="ring-wrapper">
-              <svg viewBox="0 0 44 44" class="progress-ring">
-                <circle cx="22" cy="22" r="18" fill="none" stroke="var(--arle-empty-stroke)" stroke-width="4"></circle>
-                @if (d.porcentaje > 0) {
-                  <circle cx="22" cy="22" r="18" fill="none"
-                          [attr.stroke]="d.horas >= 8 ? '#DCA038' : (state.modoNoche() ? '#D94E34' : '#68B0E8')"
-                          stroke-width="4" stroke-linecap="round"
-                          stroke-dasharray="113.09"
-                          [attr.stroke-dashoffset]="getCircleDashOffsetVal(d.porcentaje)"
-                          transform="rotate(-90 22 22)">
-                  </circle>
-                }
-              </svg>
-            </div>
-          </div>
-        }
-      </div>
-
-      <!-- Tarjeta de Horas de Sueño del Día Seleccionado -->
-      <div class="card-sueno">
-        <div class="card-header">
-          <span class="card-title">Horas de sueño</span>
-        </div>
-        
-        <div class="card-body">
-          @if (getDiaSeleccionado().registrado) {
-            <div class="time-main-row">
-              <span class="value" [style.color]="getDiaSeleccionado().horas >= 8 ? '#DCA038' : (state.modoNoche() ? '#D94E34' : '#68B0E8')">
-                {{ getDiaSeleccionado().horas }}hrs {{ getDiaSeleccionado().minutos }}mins
-              </span>
-            </div>
-            <div class="time-sub">
-              Tiempo descansando {{ getDiaSeleccionado().rango }}
-            </div>
-          } @else {
-            <div class="time-main-row">
-              <span class="value empty-val">Sin registro</span>
-            </div>
-            <div class="time-sub">
-              ¡No hay datos para este día, mide tu sueño ahora!
+      <div class="dashboard-main-stack">
+        <!-- Selector Semanal (L, M, M, J, V, S, D) -->
+        <div class="weekly-container">
+          @for (d of semana(); track d.key; let i = $index) {
+            <div
+              class="day-card"
+              [class.selected]="d.key === selectedDayKey"
+              [class.locked-day]="esDiaFuturo(i)"
+              (click)="seleccionarDia(d, i)">
+              <span class="day-label">{{ d.dia }}</span>
+              <div class="ring-wrapper">
+                <svg viewBox="0 0 44 44" class="progress-ring">
+                  <circle cx="22" cy="22" r="18" fill="none" stroke="var(--arle-empty-stroke)" stroke-width="4"></circle>
+                  @if (d.porcentaje > 0) {
+                    <circle cx="22" cy="22" r="18" fill="none"
+                            [attr.stroke]="d.horas >= 8 ? '#DCA038' : (state.modoNoche() ? '#D94E34' : '#68B0E8')"
+                            stroke-width="4" stroke-linecap="round"
+                            stroke-dasharray="113.09"
+                            [attr.stroke-dashoffset]="getCircleDashOffsetVal(d.porcentaje)"
+                            transform="rotate(-90 22 22)">
+                    </circle>
+                  }
+                </svg>
+              </div>
             </div>
           }
         </div>
-      </div>
 
-      <!-- Botón Medir: Disponible para hoy y días anteriores sin registro -->
-      <div class="bottom-action">
-        @if (!esDiaFuturoPorClave(getDiaSeleccionado().key) && !getDiaSeleccionado().registrado) {
-          <button class="btn-medir" (click)="abrirRegistro()">
-            Medir
-          </button>
-        } @else if (getDiaSeleccionado().registrado) {
-          <div class="info-registrado-txt">Día registrado correctamente</div>
-        }
+        <!-- Tarjeta de Horas de Sueño del Día Seleccionado -->
+        <div class="card-sueno">
+          <div class="card-header">
+            <div class="title-with-icon">
+              <ion-icon
+                name="bed-outline"
+                class="sleep-header-icon"
+                [style.color]="getDiaSeleccionado().registrado ? (getDiaSeleccionado().horas >= 8 ? '#DCA038' : (state.modoNoche() ? '#D94E34' : '#68B0E8')) : 'var(--arle-text-sub)'">
+              </ion-icon>
+              <span class="card-title">Horas de sueño</span>
+            </div>
+            <span class="card-date-chip">{{ fechaActual }}</span>
+          </div>
+
+          <div class="card-body">
+            @if (getDiaSeleccionado().registrado) {
+              <div class="time-main-row">
+                <span class="value" [style.color]="getDiaSeleccionado().horas >= 8 ? '#DCA038' : (state.modoNoche() ? '#D94E34' : '#68B0E8')">
+                  {{ getDiaSeleccionado().horas }}hrs {{ getDiaSeleccionado().minutos }}mins
+                </span>
+              </div>
+              <div class="time-sub">
+                Tiempo descansando {{ getDiaSeleccionado().rango }}
+              </div>
+              <div class="sleep-mini-progress">
+                <div
+                  class="sleep-mini-fill"
+                  [style.width.%]="getDiaSeleccionado().porcentaje"
+                  [style.backgroundColor]="getDiaSeleccionado().horas >= 8 ? '#DCA038' : (state.modoNoche() ? '#D94E34' : '#68B0E8')">
+                </div>
+              </div>
+              <div class="sleep-meta-footer">
+                <span>Meta recomendada: 7 a 9 hrs</span>
+                <span>Máximo registrable: 10 hrs</span>
+              </div>
+            } @else {
+              <div class="time-main-row">
+                <span class="value empty-val">Sin registro</span>
+              </div>
+              <div class="time-sub">
+                ¡No hay datos para este día, mide tu sueño ahora!
+              </div>
+              <div class="sleep-meta-footer">
+                <span>Meta recomendada: 7 a 9 hrs</span>
+                <span>Máximo registrable: 10 hrs</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Botón Medir: Disponible para hoy y días anteriores sin registro -->
+        <div class="bottom-action">
+          @if (!esDiaFuturoPorClave(getDiaSeleccionado().key) && !getDiaSeleccionado().registrado) {
+            <button class="btn-medir" (click)="abrirRegistro()">
+              Medir
+            </button>
+          } @else if (getDiaSeleccionado().registrado) {
+            <div class="info-registrado-txt">Día registrado correctamente</div>
+          }
+        </div>
       </div>
     }
 
@@ -122,7 +147,7 @@
                (pointermove)="onDrag($event)"
                (pointerup)="stopDrag()"
                (pointercancel)="stopDrag()">
-            
+
             <svg viewBox="0 0 200 200" class="interactive-ring-svg">
               <circle cx="100" cy="100" r="80" fill="none" stroke="var(--arle-empty-stroke)" stroke-width="16"></circle>
               @if (tempHoras() > 0 || tempMinutos() > 0) {
@@ -137,15 +162,15 @@
             </svg>
 
             <!-- CONTENEDOR CENTRAL -->
-            <div class="circle-inner-content" 
-                 (click)="$event.stopPropagation()" 
-                 (mousedown)="$event.stopPropagation()" 
+            <div class="circle-inner-content"
+                 (click)="$event.stopPropagation()"
+                 (mousedown)="$event.stopPropagation()"
                  (touchstart)="$event.stopPropagation()"
                  (pointerdown)="$event.stopPropagation()">
-              
+
               @if (!showManualInputs()) {
-                <div class="time-range-text clickable-time" 
-                     (click)="toggleManualInputs($event)" 
+                <div class="time-range-text clickable-time"
+                     (click)="toggleManualInputs($event)"
                      title="Haz clic para ingresar horas manualmente">
                   @if (tempHoras() === 0 && tempMinutos() === 0) {
                     <span class="empty-prompt">Toca para registrar<br><small>o desliza el círculo</small></span>

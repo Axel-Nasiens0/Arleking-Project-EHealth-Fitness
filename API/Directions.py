@@ -40,6 +40,22 @@ def arleking_get_users():
         print("Error en arleking_get_users:", e)
         return jsonify(Messages.err500), 500
 
+@app.route('/arleking/users/register', methods=['POST'])
+def arleking_register_user():
+    try:
+        return CallMethod.fnArlekingRegisterUser(request.get_json(silent=True) or {})
+    except Exception as e:
+        print("Error en arleking_register_user:", e)
+        return jsonify(Messages.err500), 500
+
+@app.route('/arleking/users/login', methods=['POST'])
+def arleking_login_user():
+    try:
+        return CallMethod.fnArlekingLoginUser(request.get_json(silent=True) or {})
+    except Exception as e:
+        print("Error en arleking_login_user:", e)
+        return jsonify(Messages.err500), 500
+
 @app.route('/arleking/users/sync', methods=['POST'])
 def arleking_sync_user():
     try:

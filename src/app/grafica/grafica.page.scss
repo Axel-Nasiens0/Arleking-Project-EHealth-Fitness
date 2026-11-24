@@ -25,7 +25,7 @@
 }
 
 .analytics-wrapper {
-  max-width: 1120px;
+  max-width: 760px;
   margin: 0 auto;
   padding: 20px 18px 36px;
 }
@@ -34,7 +34,7 @@
 .period-switch-container {
   display: flex;
   justify-content: center;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
 
   .period-switch {
     display: inline-flex;
@@ -64,17 +64,18 @@
   }
 }
 
-/* Grid de Tarjetas (2 columnas en escritorio, 1 en pantalla estrecha) */
-.charts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 18px;
+/* Lista Vertical de Gráficas */
+.charts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.card-container.chart-card {
+.card-container.chart-list-item {
+  width: 100%;
   background: var(--arle-card-bg);
-  border-radius: 32px;
-  padding: 22px 24px;
+  border-radius: 26px;
+  padding: 20px 22px;
   box-shadow: var(--arle-shadow);
   transition: background-color 0.3s ease;
 
@@ -82,7 +83,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: 18px;
     gap: 12px;
 
     .chart-title-group {
@@ -91,13 +92,14 @@
       gap: 12px;
 
       .icon-badge {
-        width: 44px;
-        height: 44px;
-        border-radius: 16px;
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 1.35rem;
+        font-size: 1.3rem;
+        flex-shrink: 0;
       }
 
       .chart-title {
@@ -121,14 +123,14 @@
     }
   }
 
-  /* Área de barras verticales */
+  /* Área de barras */
   .bars-area {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 8px;
-    height: 145px;
-    padding-top: 8px;
+    gap: 10px;
+    height: 130px;
+    padding-top: 6px;
 
     .bar-column {
       flex: 1;
@@ -141,22 +143,22 @@
 
       .bar-track {
         width: 100%;
-        max-width: 24px;
-        height: 115px;
-        border-radius: 12px;
+        max-width: 28px;
+        height: 100px;
+        border-radius: 10px;
         display: flex;
         align-items: flex-end;
         overflow: hidden;
 
         .bar-fill {
           width: 100%;
-          border-radius: 12px;
+          border-radius: 10px;
           transition: height 0.35s ease;
         }
       }
 
       .bar-label {
-        font-size: 0.7rem;
+        font-size: 0.72rem;
         font-weight: 700;
         color: var(--arle-text-sub);
       }

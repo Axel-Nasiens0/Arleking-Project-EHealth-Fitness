@@ -32,8 +32,13 @@ def _limpiar_nombre(data: dict) -> str:
     return str(nombre).strip()
 
 
+def _limpiar_password(data: dict) -> str:
+    password = data.get("password") or data.get("strPassword") or ""
+    return str(password).strip()
+
+
 # ==============================================================================
-# 1. USUARIOS (SOLO NOMBRE/APODO Y CORREO ELECTRÓNICO)
+# 1. USUARIOS (NOMBRE/APODO, CORREO ELECTRÓNICO, CONTRASEÑA Y FECHA)
 # ==============================================================================
 
 def fnArlekingGetUsers():
@@ -69,28 +74,130 @@ def fnArlekingGetUserByEmail(strCorreo):
         return jsonify(Messages.err500), 500
 
 
-def fnArlekingSyncUser(objData):
+def fnArlekingRegisterUser(objData):
     """
-    Login / registro sencillo por correo y nombre (o apodo):
-    - Si el correo ya existe en 'usuarios', actualiza su nombre/apodo si viene uno nuevo.
-    - Si no existe, inserta el nuevo usuario con insert_one.
+    Registro de nueva cuenta:
+    - Valida nombre, correo y contraseña.
+    - Rechaza si el correo o nombre ya existen en 'usuarios'.
+    - Inserta el documento con 'creadoEn' y 'actualizadoEn'.
     """
     if dbUsuarios is None:
         return jsonify({"error": "Sin conexión a MongoDB"}), 503
     try:
         correo = _limpiar_correo(objData)
-        if not correo:
-            return jsonify({"error": "El correo electrónico es obligatorio"}), 400
+        nombre_raw = _limpiar_nombre(objData)
+        password = _limpiar_password(objData)
 
-        nombre = _limpiar_nombre(objData) or correo.split("@")[0]
+        if not nombre_raw:
+            return jsonify({"error": "El nombre o apodo es obligatorio"}), 400
+        if not correo or "@" not in correo:
+            return jsonify({"error": "El correo electrónico es obligatorio"}), 400
+        if not password:
+            return jsonify({"error": "La contraseña es obligatoria"}), 400
+
+        if dbUsuarios.find_one({"correo": correo}):
+            return jsonify({"error": "Ya existe una cuenta registrada con ese correo"}), 409
+
+        if dbUsuarios.find_one({"nombre": {"$regex": f"^{nombre_raw}$", "$options": "i"}}):
+            return jsonify({"error": "Ese nombre de usuario ya está en uso"}), 409
+
+        ahora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        nuevo_usuario = {
+            "nombre": nombre_raw,
+            "correo": correo,
+            "password": password,
+            "creadoEn": ahora,
+            "actualizadoEn": ahora
+        }
+        resultado = dbUsuarios.insert_one(nuevo_usuario)
+        nuevo_usuario["_id"] = str(resultado.inserted_id)
+        return jsonify({"mensaje": "Usuario registrado correctamente", "usuario": nuevo_usuario}), 201
+    except Exception as e:
+        print("Error en fnArlekingRegisterUser:", e)
+        return jsonify(Messages.err500), 500
+
+
+def fnArlekingLoginUser(objData):
+    """
+    Inicio de sesión estricto:
+    - Busca el usuario por 'correo' o 'nombre'.
+    - Bloquea si no existe o si la contraseña no coincide.
+    - Actualiza 'actualizadoEn' y devuelve el usuario.
+    """
+    if dbUsuarios is None:
+        return jsonify({"error": "Sin conexión a MongoDB"}), 503
+    try:
+        correo = _limpiar_correo(objData)
+        nombre_raw = _limpiar_nombre(objData)
+        password = _limpiar_password(objData)
+
+        if not correo and not nombre_raw:
+            return jsonify({"error": "Ingresa tu correo o nombre de usuario"}), 400
+        if not password:
+            return jsonify({"error": "Ingresa tu contraseña"}), 400
+
+        usuario = None
+        if correo:
+            usuario = dbUsuarios.find_one({"correo": correo})
+        if not usuario and nombre_raw:
+            usuario = dbUsuarios.find_one({
+                "nombre": {"$regex": f"^{nombre_raw}$", "$options": "i"}
+            })
+
+        if not usuario:
+            return jsonify({"error": "No existe una cuenta con esos datos"}), 404
+
+        password_guardada = str(usuario.get("password") or "").strip()
+        if password_guardada and password != password_guardada:
+            return jsonify({"error": "Contraseña incorrecta"}), 401
+
+        ahora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        dbUsuarios.update_one({"_id": usuario["_id"]}, {"$set": {"actualizadoEn": ahora}})
+        usuario = dbUsuarios.find_one({"_id": usuario["_id"]})
+        usuario["_id"] = str(usuario["_id"])
+
+        return jsonify({"mensaje": "Sesión iniciada correctamente", "usuario": usuario}), 200
+    except Exception as e:
+        print("Error en fnArlekingLoginUser:", e)
+        return jsonify(Messages.err500), 500
+
+
+def fnArlekingSyncUser(objData):
+    """
+    Sincronización / upsert por correo o nombre de usuario:
+    - Busca por 'correo' o, si entra por username/nombre, por 'nombre'.
+    - Si existe, actualiza 'actualizadoEn' (y 'nombre' / 'password' si vienen informados).
+    - Si no existe, inserta el nuevo usuario con 'creadoEn' y 'actualizadoEn'.
+    """
+    if dbUsuarios is None:
+        return jsonify({"error": "Sin conexión a MongoDB"}), 503
+    try:
+        correo = _limpiar_correo(objData)
+        nombre_raw = _limpiar_nombre(objData)
+        password = _limpiar_password(objData)
+
+        if not correo and not nombre_raw:
+            return jsonify({"error": "El correo electrónico o nombre de usuario es obligatorio"}), 400
+
+        if not correo and nombre_raw:
+            slug = "".join(ch if ch.isalnum() or ch in "._-" else "_" for ch in nombre_raw.lower())
+            correo = f"{slug or 'usuario'}@arleking.local"
+
+        nombre = nombre_raw or correo.split("@")[0]
         ahora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         existente = dbUsuarios.find_one({"correo": correo})
+        if not existente and nombre_raw:
+            existente = dbUsuarios.find_one({
+                "nombre": {"$regex": f"^{nombre_raw}$", "$options": "i"}
+            })
 
         if existente:
             cambios = {"actualizadoEn": ahora}
-            if _limpiar_nombre(objData):
-                cambios["nombre"] = nombre
+            if nombre_raw:
+                cambios["nombre"] = nombre_raw
+            if password:
+                cambios["password"] = password
 
             dbUsuarios.update_one({"_id": existente["_id"]}, {"$set": cambios})
             usuario = dbUsuarios.find_one({"_id": existente["_id"]})
@@ -103,6 +210,9 @@ def fnArlekingSyncUser(objData):
             "creadoEn": ahora,
             "actualizadoEn": ahora
         }
+        if password:
+            nuevo_usuario["password"] = password
+
         resultado = dbUsuarios.insert_one(nuevo_usuario)
         nuevo_usuario["_id"] = str(resultado.inserted_id)
         return jsonify({"mensaje": "Usuario registrado correctamente", "usuario": nuevo_usuario}), 201

@@ -142,7 +142,54 @@
       
       <div class="scan-top-section">
         <div class="heart-visual" [class.latiendo]="huellaDetectada()">
-          <ion-icon name="heart"></ion-icon>
+          <svg
+            class="realistic-heart-svg"
+            viewBox="0 0 120 120"
+            aria-label="Corazón anatómico"
+            role="img">
+            <!-- Vasos superiores (aorta / vena cava / pulmonar) -->
+            <path
+              class="vessel-back"
+              d="M44 34 L44 16 C44 12 52 12 52 16 L52 30 M58 31 L58 12 C58 8 68 8 68 12 L68 29 M73 33 L78 18 C79 14 87 16 86 20 L81 36"
+              fill="none"
+              stroke-width="6"
+              stroke-linecap="round"
+              stroke-linejoin="round" />
+
+            <!-- Cuerpo anatómico del corazón -->
+            <path
+              class="heart-body"
+              d="M62 31
+                 C46 25, 24 34, 24 58
+                 C24 80, 48 96, 63 108
+                 C78 96, 98 79, 98 56
+                 C98 37, 80 26, 62 31 Z" />
+
+            <!-- Sombreado y volumen interno de ventrículos y aurículas -->
+            <path
+              class="heart-shade"
+              d="M62 31
+                 C77 32, 92 42, 92 58
+                 C92 77, 75 92, 63 103
+                 C59 88, 60 62, 62 31 Z" />
+
+            <!-- Surco interventricular / detalle de cámaras -->
+            <path
+              class="heart-groove"
+              d="M54 44 C50 58, 53 74, 62 92 M66 42 C72 52, 74 64, 71 76"
+              fill="none"
+              stroke-width="2.2"
+              stroke-linecap="round" />
+
+            <!-- Brillo especular -->
+            <ellipse
+              class="heart-highlight"
+              cx="40"
+              cy="48"
+              rx="6"
+              ry="10"
+              transform="rotate(-22 40 48)" />
+          </svg>
         </div>
 
         <h2 class="scan-title">
@@ -164,11 +211,11 @@
             <div class="ecg-live-track">
               <svg viewBox="0 0 300 60" preserveAspectRatio="none">
                 <path d="M0,30 L40,30 L50,10 L60,50 L70,20 L80,40 L90,30 L150,30 L160,6 L170,54 L180,15 L190,45 L200,30 L300,30"
-                      stroke="#d4af37" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                      stroke="#e53935" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
               <svg viewBox="0 0 300 60" preserveAspectRatio="none">
                 <path d="M0,30 L40,30 L50,10 L60,50 L70,20 L80,40 L90,30 L150,30 L160,6 L170,54 L180,15 L190,45 L200,30 L300,30"
-                      stroke="#d4af37" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                      stroke="#e53935" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
           </div>

@@ -1,5 +1,6 @@
-import { Injectable, signal, computed, effect } from '@angular/core';
+import { Injectable, signal, computed, effect, inject } from '@angular/core';
 import { Motion } from '@capacitor/motion';
+import { ArlekingApiService } from './arleking-api.service';
 
 export interface MetaLogro {
   id: string;
@@ -40,12 +41,16 @@ export interface UsuarioArleking {
   semana: DiaSemanaRegistro[];
   ultimaFechaISO?: string;
   ultimaSemanaId?: string;
+  creadoEn?: string;
+  actualizadoEn?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ArlekingStateService {
+  private api = inject(ArlekingApiService);
+
   usuario = signal<UsuarioArleking | null>(this.cargarUsuarioLocal());
   estaAutenticado = computed(() => this.usuario() !== null);
 
@@ -138,10 +143,12 @@ export class ArlekingStateService {
     const historial = this.obtenerHistorialDB();
     const idx = historial.findIndex(r => r.fecha === fechaStr);
 
+    let registroActualizado: RegistroDiarioDB;
     if (idx >= 0) {
-      historial[idx] = { ...historial[idx], ...datosParciales };
+      registroActualizado = { ...historial[idx], ...datosParciales };
+      historial[idx] = registroActualizado;
     } else {
-      historial.push({
+      registroActualizado = {
         fecha: fechaStr,
         semanaId: this.obtenerSemanaId(fecha),
         mesIndex: fecha.getMonth(),
@@ -152,10 +159,55 @@ export class ArlekingStateService {
         lpm: 0,
         horasSueno: 0,
         ...datosParciales
-      });
+      };
+      historial.push(registroActualizado);
     }
 
     localStorage.setItem(`arleking_historial_${correo}`, JSON.stringify(historial));
+
+    // Sincronizar sueño y pasos con MongoDB vía Flask si hay sesión activa
+    const usuarioActual = this.usuario();
+    if (!usuarioActual?.correo) return;
+
+    if (datosParciales.horasSueno !== undefined) {
+      const totalMins = Math.round(registroActualizado.horasSueno * 60);
+      const horas = Math.min(Math.floor(totalMins / 60), 10);
+      const minutos = horas >= 10 ? 0 : totalMins % 60;
+      const porcentaje = Math.min(Math.round(((horas * 60 + minutos) / 600) * 100), 100);
+
+      this.api.guardarSueno({
+        correo: usuarioActual.correo,
+        fecha: fechaStr,
+        horas,
+        minutos,
+        porcentaje,
+        rango: registroActualizado.rangoSueno || ''
+      }).subscribe({
+        error: (err) => console.warn('Error sincronizando sueño con MongoDB:', err)
+      });
+    }
+
+    if (
+      datosParciales.pasos !== undefined ||
+      datosParciales.calorias !== undefined ||
+      datosParciales.tiempoMins !== undefined ||
+      datosParciales.lpm !== undefined
+    ) {
+      this.api.guardarPasos({
+        correo: usuarioActual.correo,
+        fecha: fechaStr,
+        semanaId: registroActualizado.semanaId,
+        mesIndex: registroActualizado.mesIndex,
+        anio: registroActualizado.anio,
+        pasos: registroActualizado.pasos,
+        calorias: registroActualizado.calorias,
+        tiempoMins: registroActualizado.tiempoMins,
+        lpm: registroActualizado.lpm,
+        pasosPorFranja: this.pasosPorFranja()
+      }).subscribe({
+        error: (err) => console.warn('Error sincronizando pasos con MongoDB:', err)
+      });
+    }
   }
 
   // ==================== RESTAURACIÓN Y REINICIO POR CAMBIO DE DÍA/SEMANA ====================
@@ -179,7 +231,7 @@ export class ArlekingStateService {
     const esMismaSemana = user.ultimaSemanaId === semanaActualId;
 
     this.pasosHistoricos.set(user.pasosHistoricos || 0);
-   const metaValida = (!user.metaDiaria || user.metaDiaria === 16000) ? 6000 : user.metaDiaria;
+    const metaValida = (!user.metaDiaria || user.metaDiaria === 16000) ? 6000 : user.metaDiaria;
     this.pasosMetaDiaria.set(metaValida);
 
     this.pasosActuales.set(esMismoDia ? (user.pasosHoy || 0) : 0);
@@ -308,17 +360,24 @@ export class ArlekingStateService {
 
   // ==================== SESIÓN Y PERSISTENCIA ====================
 
-  iniciarSesion(correo: string, nombre: string) {
-    const correoNorm = correo.toLowerCase();
+  iniciarSesion(correo: string, nombre: string, password?: string) {
+    const correoNorm = correo.trim().toLowerCase();
+    const nombreLimpio = (nombre || '').trim();
+    const passwordLimpia = (password || '').trim();
+    const ahoraISO = new Date().toISOString();
     const respaldoPrevio = localStorage.getItem(`arleking_backup_${correoNorm}`);
     let datosUsuario: UsuarioArleking;
 
     if (respaldoPrevio) {
       datosUsuario = JSON.parse(respaldoPrevio);
+      if (nombreLimpio) {
+        datosUsuario.nombre = nombreLimpio;
+      }
+      datosUsuario.actualizadoEn = ahoraISO;
     } else {
       datosUsuario = {
         correo: correoNorm,
-        nombre: nombre || correoNorm.split('@')[0],
+        nombre: nombreLimpio || correoNorm.split('@')[0],
         pasosHistoricos: 0,
         pasosHoy: 0,
         tiempoHoy: 0,
@@ -326,13 +385,42 @@ export class ArlekingStateService {
         pasosPorFranja: [0, 0, 0, 0, 0],
         semana: this.crearSemanaVacia(),
         ultimaFechaISO: this.obtenerFechaISO(),
-        ultimaSemanaId: this.obtenerSemanaId()
+        ultimaSemanaId: this.obtenerSemanaId(),
+        creadoEn: ahoraISO,
+        actualizadoEn: ahoraISO
       };
     }
 
     this.usuario.set(datosUsuario);
     this.restaurarDatosEnSignals(datosUsuario);
     this.guardarProgresoLocal();
+
+    // Sincronizar perfil con MongoDB Atlas vía Flask
+    this.api.sincronizarUsuario({
+      correo: correoNorm,
+      nombre: nombreLimpio || datosUsuario.nombre,
+      ...(passwordLimpia ? { password: passwordLimpia } : {})
+    }).subscribe({
+      next: (res) => {
+        if (res?.usuario) {
+          const actual = this.usuario();
+          if (actual) {
+            const actualizado: UsuarioArleking = {
+              ...actual,
+              nombre: res.usuario.nombre || actual.nombre,
+              creadoEn: res.usuario.creadoEn || actual.creadoEn,
+              actualizadoEn: res.usuario.actualizadoEn || ahoraISO
+            };
+            this.usuario.set(actualizado);
+            localStorage.setItem('arleking_active_session', JSON.stringify(actualizado));
+            localStorage.setItem(`arleking_backup_${correoNorm}`, JSON.stringify(actualizado));
+          }
+        }
+      },
+      error: (err) => {
+        console.warn('No se pudo sincronizar el usuario con MongoDB:', err);
+      }
+    });
   }
 
   cerrarSesion() {
@@ -358,7 +446,8 @@ export class ArlekingStateService {
       pasosPorFranja: this.pasosPorFranja(),
       semana: this.diasSemana(),
       ultimaFechaISO: this.obtenerFechaISO(),
-      ultimaSemanaId: this.obtenerSemanaId()
+      ultimaSemanaId: this.obtenerSemanaId(),
+      actualizadoEn: new Date().toISOString()
     };
 
     this.usuario.set(actualizado);

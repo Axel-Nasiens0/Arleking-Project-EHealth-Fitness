@@ -75,39 +75,72 @@
     </div>
   </div>
 
-  <!-- Contenedor Vertical de Widgets -->
+  <!-- Contenedor Vertical de Widgets con mismo formato que Ir a Gráficas -->
   <div class="cards-stack">
-    <!-- Tarjeta de Progreso de Pasos (Fondo claro -> Relleno Cyan) -->
-    <div class="card-container widget-card" (click)="irADetallePasos()">
+    <!-- 1. Pasos -->
+    <button type="button" class="card-container widget-card nav-style-card steps-card" (click)="irADetallePasos()">
       <div class="widget-info">
-        <span class="widget-title"><b>{{ state.pasosActuales() | number }}</b></span>
-        <span class="widget-subtitle">/{{ state.pasosMetaDiaria() | number }} Pasos</span>
+        <div class="widget-title-row">
+          <ion-icon name="footsteps-outline" class="widget-icon icon-steps"></ion-icon>
+          <span class="widget-title">Pasos · <b>{{ state.pasosActuales() | number }}</b></span>
+        </div>
+        <span class="widget-subtitle">Meta diaria: {{ state.pasosMetaDiaria() | number }} pasos · {{ state.distanciaKm() }} km</span>
       </div>
-      <div class="steps-progress-bar">
-        <div class="progress-fill" [style.width.%]="(state.pasosActuales() / state.pasosMetaDiaria()) * 100"></div>
-      </div>
-    </div>
 
-    <!-- Tarjeta Ritmo Cardíaco -->
-    <div class="card-container widget-card" (click)="irACorazon()">
-      <div class="widget-info">
-        <span class="widget-title">Ritmo Cardíaco</span>
-        <span class="widget-subtitle">{{ state.ritmoCardiaco() ?? '--' }} LPM</span>
+      <div class="widget-right-group">
+        <div class="steps-progress-bar">
+          <div class="progress-fill" [style.width.%]="(state.pasosActuales() / state.pasosMetaDiaria()) * 100"></div>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="card-chevron"></ion-icon>
       </div>
-      <button class="heart-action-btn">
-        <span>Registra tu<br>Ritmo</span>
-      </button>
-    </div>
+    </button>
 
-    <!-- Tarjeta Horas de Sueño (Fondo claro -> Relleno Rojo Intenso) -->
-    <div class="card-container widget-card" (click)="irASueno()">
+    <!-- 2. Ritmo Cardíaco -->
+    <button type="button" class="card-container widget-card nav-style-card heart-card" (click)="irACorazon()">
       <div class="widget-info">
-        <span class="widget-title">Horas de sueño</span>
-        <span class="widget-subtitle">{{ state.horasSueno() }} Hrs</span>
+        <div class="widget-title-row">
+          <ion-icon name="heart-outline" class="widget-icon icon-heart"></ion-icon>
+          <span class="widget-title">Ritmo Cardíaco</span>
+        </div>
+        <span class="widget-subtitle">Último registro: {{ state.ritmoCardiaco() ?? '--' }} LPM</span>
       </div>
-      <div class="sleep-progress-bar">
-        <div class="sleep-fill" [style.width.%]="(state.horasSueno() / state.horasSuenoMeta) * 100"></div>
+
+      <div class="widget-right-group">
+        <span class="heart-pill">
+          {{ state.ritmoCardiaco() ? (state.ritmoCardiaco() + ' LPM') : 'Registrar' }}
+        </span>
+        <ion-icon name="chevron-forward-outline" class="card-chevron"></ion-icon>
       </div>
-    </div>
+    </button>
+
+    <!-- 3. Horas de Sueño -->
+    <button type="button" class="card-container widget-card nav-style-card sleep-card" (click)="irASueno()">
+      <div class="widget-info">
+        <div class="widget-title-row">
+          <ion-icon name="bed-outline" class="widget-icon icon-sleep"></ion-icon>
+          <span class="widget-title">Horas de sueño</span>
+        </div>
+        <span class="widget-subtitle">{{ state.horasSueno() }} Hrs dormidas de {{ state.horasSuenoMeta }} Hrs</span>
+      </div>
+
+      <div class="widget-right-group">
+        <div class="sleep-progress-bar">
+          <div class="sleep-fill" [style.width.%]="(state.horasSueno() / state.horasSuenoMeta) * 100"></div>
+        </div>
+        <ion-icon name="chevron-forward-outline" class="card-chevron"></ion-icon>
+      </div>
+    </button>
+
+    <!-- 4. Ir a Gráficas -->
+    <button type="button" class="card-container widget-card nav-style-card graficas-nav-card" (click)="irAGraficas()">
+      <div class="widget-info">
+        <div class="widget-title-row">
+          <ion-icon name="bar-chart-outline" class="widget-icon graficas-icon"></ion-icon>
+          <span class="widget-title">Ir a Graficas</span>
+        </div>
+        <span class="widget-subtitle">Ver analítica por día, mes y año</span>
+      </div>
+      <ion-icon name="chevron-forward-outline" class="card-chevron"></ion-icon>
+    </button>
   </div>
 </ion-content>

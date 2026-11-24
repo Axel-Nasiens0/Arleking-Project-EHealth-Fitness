@@ -1,13 +1,15 @@
 ion-toolbar {
-  --background: var(--ion-toolbar-background, var(--ion-background-color, #ffffff));
-  --color: var(--ion-text-color, #000000);
+  --background: var(--arle-card-bg);
+  --color: var(--arle-text-main);
+  --border-width: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
 
   .icon-btn {
     background: transparent;
     border: none;
-    color: var(--ion-text-color, #000000);
-    font-size: 22px;
-    padding: 6px 8px;
+    color: var(--arle-text-main);
+    font-size: 1.4rem;
+    padding: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -16,19 +18,23 @@ ion-toolbar {
 
   ion-title {
     font-weight: 800;
-    letter-spacing: 0.5px;
+    letter-spacing: 2px;
     font-size: 16px;
-    color: var(--ion-text-color, #000000);
+    color: var(--arle-text-main);
   }
 
   ion-button,
   ion-back-button {
-    --color: var(--ion-text-color, #000000);
+    --color: var(--arle-text-main);
   }
 }
 
 ion-content {
-  --background: var(--ion-background-color, #ffffff);
+  --background: var(--arle-bg);
+  --padding-start: 16px;
+  --padding-end: 16px;
+  --padding-bottom: 24px;
+  transition: background-color 0.3s ease;
 }
 
 .page-wrapper {
@@ -36,29 +42,32 @@ ion-content {
   flex-direction: column;
   justify-content: space-between;
   min-height: 100%;
-  padding: 16px 20px 0 20px;
-  background-color: var(--ion-background-color, #ffffff);
-  color: var(--ion-text-color, #111111);
+  padding: 16px 4px 0 4px;
+  background-color: transparent;
+  color: var(--arle-text-main);
+  transition: color 0.3s ease;
 }
 
 .top-section {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 16px;
   text-align: center;
 }
 
 .avatar-yellow {
   width: 88px;
   height: 88px;
-  border-radius: 50%;
-  background-color: rgba(212, 175, 55, 0.14);
-  border: 1.5px solid rgba(212, 175, 55, 0.32);
+  border-radius: 32px;
+  background-color: var(--arle-card-bg);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: var(--arle-shadow);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 14px;
+  transition: background-color 0.3s ease, border-color 0.2s ease;
 
   ion-icon {
     font-size: 42px;
@@ -69,16 +78,17 @@ ion-content {
 .welcome-title {
   font-size: 20px;
   font-weight: 800;
-  color: var(--ion-text-color, #111111);
+  color: var(--arle-text-main);
   margin: 0 0 6px 0;
 }
 
 .welcome-sub {
   font-size: 13px;
-  color: var(--ion-color-medium, #888888);
-  max-width: 260px;
+  color: var(--arle-text-sub);
+  max-width: 280px;
   margin: 0;
   line-height: 1.4;
+  font-weight: 500;
 }
 
 .middle-section {
@@ -86,30 +96,32 @@ ion-content {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  margin: 24px 0;
+  margin: 20px 0;
 }
 
 .card-measure {
   width: 100%;
-  background: var(--ion-card-background, var(--ion-item-background, #ffffff));
-  border: 1px solid rgba(128, 128, 128, 0.14);
-  border-radius: 20px;
-  padding: 28px 20px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+  background: var(--arle-card-bg);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  border-radius: 32px;
+  padding: 24px;
+  box-shadow: var(--arle-shadow);
   text-align: center;
+  transition: background-color 0.3s ease, border-color 0.2s ease;
 
   .lpm-placeholder {
     font-size: 20px;
     font-weight: 700;
-    color: var(--ion-color-medium, #aaaaaa);
+    color: var(--arle-text-sub);
     margin: 0 0 18px 0;
   }
 
   .bar-pill {
     width: 100%;
-    height: 16px;
-    background-color: rgba(128, 128, 128, 0.16);
+    height: 18px;
+    background-color: var(--arle-bg);
     border-radius: 12px;
+    overflow: hidden;
   }
 
   .bar-labels {
@@ -118,7 +130,7 @@ ion-content {
     margin-top: 8px;
     font-size: 12px;
     font-weight: 600;
-    color: var(--ion-color-medium, #888888);
+    color: var(--arle-text-sub);
   }
 }
 
@@ -127,30 +139,41 @@ ion-content {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .featured-card {
-  background: var(--ion-card-background, var(--ion-item-background, #ffffff));
-  border-radius: 22px;
-  padding: 18px 20px;
-  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(128, 128, 128, 0.14);
+  background: var(--arle-card-bg);
+  border-radius: 32px;
+  padding: 20px 24px;
+  box-shadow: var(--arle-shadow);
+  border: 1px solid rgba(212, 175, 55, 0.32);
   cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    border-color: #d4af37;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
 }
 
 .featured-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
 
   .featured-date {
     font-size: 12px;
     font-weight: 700;
-    color: #2b73b7;
-    background-color: rgba(43, 115, 183, 0.14);
-    padding: 4px 10px;
-    border-radius: 14px;
+    color: #26C6DA;
+    background-color: var(--arle-bg);
+    padding: 5px 12px;
+    border-radius: 999px;
   }
 
   .status-pill {
@@ -161,8 +184,8 @@ ion-content {
     font-weight: 700;
     color: #0e6c55;
     background: rgba(14, 108, 85, 0.14);
-    padding: 4px 10px;
-    border-radius: 20px;
+    padding: 5px 12px;
+    border-radius: 999px;
 
     .dot {
       width: 7px;
@@ -191,7 +214,7 @@ ion-content {
   .big-bpm {
     font-size: 48px;
     font-weight: 800;
-    color: var(--ion-text-color, #111111);
+    color: var(--arle-text-main);
     line-height: 1;
   }
 
@@ -201,14 +224,14 @@ ion-content {
     align-items: flex-start;
 
     .mini-heart {
-      color: #d4af37;
+      color: #e53935;
       font-size: 18px;
     }
 
     span {
       font-size: 12px;
       font-weight: 800;
-      color: var(--ion-color-medium, #555555);
+      color: var(--arle-text-sub);
     }
   }
 }
@@ -217,26 +240,27 @@ ion-content {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 4px 0 4px;
+  padding: 4px 6px 0 6px;
 
   span {
     font-size: 13px;
     font-weight: 700;
-    color: var(--ion-color-medium, #555555);
+    color: var(--arle-text-sub);
   }
 
   .btn-clear {
     background: none;
     border: none;
     font-size: 12px;
-    color: var(--ion-color-medium, #aaaaaa);
+    font-weight: 600;
+    color: var(--arle-text-sub);
     display: flex;
     align-items: center;
     gap: 4px;
     cursor: pointer;
 
     &:hover {
-      color: #d4af37;
+      color: #E91E63;
     }
   }
 }
@@ -244,22 +268,33 @@ ion-content {
 .history-cards {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
   max-height: 240px;
   overflow-y: auto;
 }
 
 .history-row-card {
-  background: var(--ion-card-background, var(--ion-item-background, #f7f9fc));
-  border: 1px solid rgba(128, 128, 128, 0.14);
-  border-radius: 16px;
-  padding: 12px 16px;
+  background: var(--arle-card-bg);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 32px;
+  padding: 16px 22px;
+  box-shadow: var(--arle-shadow);
   cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease, border-color 0.2s ease;
+
+  &:hover {
+    border-color: #d4af37;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.99);
+  }
 
   .row-top-date {
     font-size: 11px;
     font-weight: 600;
-    color: var(--ion-color-medium, #666666);
+    color: var(--arle-text-sub);
     margin-bottom: 6px;
   }
 
@@ -278,14 +313,14 @@ ion-content {
     .row-bpm-num {
       font-size: 20px;
       font-weight: 800;
-      color: var(--ion-text-color, #111111);
+      color: var(--arle-text-main);
       line-height: 1.1;
     }
 
     .row-bpm-lbl {
       font-size: 10px;
       font-weight: 700;
-      color: var(--ion-color-medium, #666666);
+      color: var(--arle-text-sub);
     }
   }
 
@@ -307,12 +342,12 @@ ion-content {
     .row-estado {
       font-size: 14px;
       font-weight: 700;
-      color: var(--ion-text-color, #111111);
+      color: var(--arle-text-main);
     }
 
     .row-submetrics {
       font-size: 12px;
-      color: var(--ion-color-medium, #888888);
+      color: var(--arle-text-sub);
       margin-top: 2px;
     }
   }
@@ -330,33 +365,78 @@ ion-content {
   text-align: center;
 
   .heart-visual {
-    font-size: 84px;
-    color: rgba(212, 175, 55, 0.5);
-    line-height: 1;
+    width: 108px;
+    height: 108px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 8px;
-    transition: color 0.3s ease, transform 0.25s ease, filter 0.3s ease;
+    transition: transform 0.25s ease, filter 0.3s ease;
+
+    .realistic-heart-svg {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+
+      .vessel-back {
+        stroke: #b71c1c;
+        transition: stroke 0.3s ease;
+      }
+
+      .heart-body {
+        fill: #e53935;
+        stroke: #9e1b18;
+        stroke-width: 2.5;
+        transition: fill 0.3s ease, stroke 0.3s ease;
+      }
+
+      .heart-shade {
+        fill: rgba(120, 12, 12, 0.28);
+      }
+
+      .heart-groove {
+        stroke: rgba(255, 225, 225, 0.45);
+      }
+
+      .heart-highlight {
+        fill: rgba(255, 255, 255, 0.38);
+      }
+    }
+
+    &:not(.latiendo) .realistic-heart-svg {
+      opacity: 0.72;
+    }
 
     &.latiendo {
-      color: #d4af37;
-      filter: drop-shadow(0 4px 14px rgba(212, 175, 55, 0.45));
+      filter: drop-shadow(0 6px 16px rgba(229, 57, 53, 0.48));
       animation: heartBeatScale 0.8s infinite;
+
+      .realistic-heart-svg {
+        .vessel-back {
+          stroke: #c62828;
+        }
+        .heart-body {
+          fill: #ef233c;
+          stroke: #8d0801;
+        }
+      }
     }
   }
 
   .scan-title {
     font-size: 18px;
     font-weight: 700;
-    color: var(--ion-text-color, #111111);
+    color: var(--arle-text-main);
     margin: 0;
   }
 
   .cancel-warning {
     font-size: 12px;
     font-weight: 600;
-    color: #d4af37;
-    background-color: rgba(212, 175, 55, 0.15);
-    border: 1px solid rgba(212, 175, 55, 0.35);
-    border-radius: 10px;
+    color: #e53935;
+    background-color: rgba(229, 57, 53, 0.14);
+    border: 1px solid rgba(229, 57, 53, 0.35);
+    border-radius: 16px;
     padding: 6px 12px;
     margin: 8px 0 0 0;
   }
@@ -382,7 +462,7 @@ ion-content {
   width: 78%;
   max-width: 300px;
   height: 3px;
-  background-color: #d4af37;
+  background-color: #e53935;
   border-radius: 2px;
   margin: 26px 0;
 }
@@ -406,7 +486,7 @@ ion-content {
     height: 100%;
 
     path {
-      stroke: #d4af37;
+      stroke: #e53935;
     }
   }
 }
@@ -419,15 +499,17 @@ ion-content {
 .progress-wrapper {
   width: 78%;
   max-width: 300px;
-  height: 6px;
-  background-color: rgba(128, 128, 128, 0.2);
-  border-radius: 6px;
+  height: 18px;
+  background-color: var(--arle-card-bg);
+  box-shadow: var(--arle-shadow);
+  border-radius: 12px;
   margin-top: 12px;
   overflow: hidden;
 
   .progress-fill {
     height: 100%;
-    background-color: #d4af37;
+    background-color: #e53935;
+    border-radius: 12px;
     transition: width 0.1s linear;
   }
 }
@@ -435,8 +517,8 @@ ion-content {
 .progress-time {
   font-size: 12px;
   font-weight: 600;
-  color: var(--ion-color-medium, #888888);
-  margin-top: 6px;
+  color: var(--arle-text-sub);
+  margin-top: 8px;
 }
 
 .live-lpm-counter {
@@ -448,37 +530,38 @@ ion-content {
   .live-num {
     font-size: 32px;
     font-weight: 800;
-    color: var(--ion-text-color, #111111);
+    color: var(--arle-text-main);
   }
 
   .live-unit {
     font-size: 16px;
     font-weight: 700;
-    color: var(--ion-color-medium, #555555);
+    color: var(--arle-text-sub);
   }
 }
 
 .bottom-card {
-  width: calc(100% + 40px);
-  margin-left: -20px;
-  background: var(--ion-card-background, var(--ion-item-background, #ffffff));
-  border-top: 1px solid rgba(128, 128, 128, 0.15);
-  border-radius: 28px 28px 0 0;
+  width: calc(100% + 8px);
+  margin-left: -4px;
+  background: var(--arle-card-bg);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 32px 32px 0 0;
   padding: 24px 24px 28px 24px;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04);
+  box-shadow: var(--arle-shadow);
   text-align: center;
   user-select: none;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: background-color 0.3s ease, border-color 0.2s ease;
 
   .fingerprint-ring {
     width: 86px;
     height: 86px;
-    border-radius: 50%;
-    background-color: rgba(128, 128, 128, 0.1);
-    border: 2px solid rgba(128, 128, 128, 0.18);
+    border-radius: 32px;
+    background-color: var(--arle-bg);
+    border: 1.5px solid rgba(212, 175, 55, 0.28);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -487,7 +570,7 @@ ion-content {
 
     .fingerprint-icon {
       font-size: 48px;
-      color: var(--ion-text-color, #333333);
+      color: var(--arle-text-main);
       transition: color 0.25s ease, transform 0.25s ease;
     }
 
@@ -506,7 +589,7 @@ ion-content {
   .guide-title {
     font-size: 14px;
     font-weight: 700;
-    color: var(--ion-text-color, #111111);
+    color: var(--arle-text-main);
     margin: 0;
     line-height: 1.4;
   }
@@ -523,10 +606,11 @@ ion-content {
 
   .result-timestamp {
     font-size: 12px;
-    color: #2b73b7;
-    background-color: rgba(43, 115, 183, 0.14);
-    padding: 4px 10px;
-    border-radius: 14px;
+    color: #26C6DA;
+    background-color: var(--arle-card-bg);
+    box-shadow: var(--arle-shadow);
+    padding: 5px 12px;
+    border-radius: 999px;
     font-weight: 700;
   }
 
@@ -545,17 +629,18 @@ ion-content {
 }
 
 .result-hero {
-  background: var(--ion-card-background, var(--ion-item-background, #ffffff));
-  border: 1px solid rgba(128, 128, 128, 0.14);
-  border-radius: 22px;
-  padding: 20px 16px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+  background: var(--arle-card-bg);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  border-radius: 32px;
+  padding: 20px 24px;
+  box-shadow: var(--arle-shadow);
   text-align: center;
+  transition: background-color 0.3s ease;
 
   .hero-subtitle {
     font-size: 13px;
     font-weight: 700;
-    color: var(--ion-color-medium, #666666);
+    color: var(--arle-text-sub);
   }
 
   .hero-bpm-row {
@@ -568,7 +653,7 @@ ion-content {
     .hero-bpm-value {
       font-size: 52px;
       font-weight: 800;
-      color: var(--ion-text-color, #111111);
+      color: var(--arle-text-main);
       line-height: 1;
     }
 
@@ -578,14 +663,14 @@ ion-content {
       align-items: flex-start;
 
       .hero-heart {
-        color: #d4af37;
+        color: #e53935;
         font-size: 18px;
       }
 
       span {
         font-size: 12px;
         font-weight: 800;
-        color: var(--ion-color-medium, #555555);
+        color: var(--arle-text-sub);
       }
     }
   }
@@ -597,7 +682,7 @@ ion-content {
     margin: 6px auto 0 auto;
 
     .ecg-draw {
-      stroke: #d4af37;
+      stroke: #e53935;
       stroke-dasharray: 450;
       stroke-dashoffset: 450;
       animation: drawWave 1s ease-out forwards;
@@ -610,15 +695,18 @@ ion-content {
 }
 
 .diagnosis-card {
-  background: var(--ion-card-background, var(--ion-item-background, #f7f9fc));
-  border: 1px solid rgba(128, 128, 128, 0.14);
-  border-radius: 20px;
-  padding: 18px;
+  background: var(--arle-card-bg);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 32px;
+  padding: 20px 24px;
+  box-shadow: var(--arle-shadow);
+  transition: background-color 0.3s ease;
 
   .diag-header {
     font-size: 13px;
-    color: var(--ion-color-medium, #555555);
+    color: var(--arle-text-sub);
     margin-bottom: 4px;
+    font-weight: 600;
   }
 
   .diag-status {
@@ -640,7 +728,7 @@ ion-content {
       position: relative;
       transform: translateX(-50%);
       font-size: 12px;
-      color: var(--ion-text-color, #111111);
+      color: var(--arle-text-main);
       line-height: 1;
       margin-bottom: 3px;
       width: 14px;
@@ -654,10 +742,12 @@ ion-content {
       .seg {
         flex: 1;
         border-radius: 6px;
+        transition: background-color 0.25s ease;
       }
-      .seg-bajo { background-color: #0e6c55; }
-      .seg-normal { background-color: #dca038; }
-      .seg-alto { background-color: #d9383a; }
+
+      .seg-bajo { background-color: #2979FF; }
+      .seg-normal { background-color: #FF1744; }
+      .seg-alto { background-color: #7E57C2; }
     }
 
     .range-ticks {
@@ -665,7 +755,7 @@ ion-content {
       justify-content: space-between;
       font-size: 10px;
       font-weight: 600;
-      color: var(--ion-color-medium, #888888);
+      color: var(--arle-text-sub);
       margin-top: 4px;
     }
   }
@@ -673,9 +763,16 @@ ion-content {
   .diag-text {
     font-size: 13px;
     line-height: 1.5;
-    color: var(--ion-text-color, #333333);
+    color: var(--arle-text-main);
     margin: 0;
   }
+}
+
+:host-context(body:not(.dark-theme)) .range-bar-wrapper .range-segments,
+body:not(.dark-theme) .range-bar-wrapper .range-segments {
+  .seg-bajo { background-color: #26C6DA; }
+  .seg-normal { background-color: #FF6E6E; }
+  .seg-alto { background-color: #9575CD; }
 }
 
 .bottom-section {
@@ -684,14 +781,14 @@ ion-content {
 }
 
 .btn-yellow {
-  --background: var(--ion-card-background, var(--ion-item-background, #ffffff));
-  --background-activated: rgba(128, 128, 128, 0.14);
-  --color: var(--ion-text-color, #111111);
-  --border-color: rgba(128, 128, 128, 0.22);
+  --background: var(--arle-card-bg);
+  --background-activated: var(--arle-bg);
+  --color: var(--arle-text-main);
+  --border-color: rgba(212, 175, 55, 0.35);
   --border-style: solid;
   --border-width: 1.5px;
   --border-radius: 25px;
-  --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+  --box-shadow: var(--arle-shadow);
   font-weight: 700;
   text-transform: none;
   height: 48px;
@@ -699,11 +796,14 @@ ion-content {
 }
 
 .btn-save {
-  --background: #d4af37;
-  --background-activated: #bfa030;
-  --color: #121212;
+  --background: var(--arle-card-bg);
+  --background-activated: var(--arle-bg);
+  --color: var(--arle-text-main);
+  --border-color: rgba(128, 128, 128, 0.25);
+  --border-style: solid;
+  --border-width: 1px;
   --border-radius: 25px;
-  --box-shadow: none;
+  --box-shadow: var(--arle-shadow);
   font-weight: 700;
   text-transform: none;
   height: 48px;

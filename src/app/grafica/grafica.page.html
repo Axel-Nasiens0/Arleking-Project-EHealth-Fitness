@@ -67,10 +67,10 @@
       </div>
     </div>
 
-    <!-- Grid Responsivo con las 5 Gráficas (Inspirado en las tarjetas de folder) -->
-    <div class="charts-grid">
+    <!-- Lista de Gráficas -->
+    <div class="charts-list" role="list">
       @for (item of graficas(); track item.id) {
-        <div class="card-container chart-card">
+        <div class="card-container chart-list-item" role="listitem">
           <div class="chart-header">
             <div class="chart-title-group">
               <div class="icon-badge" [style.background]="item.bgSoft" [style.color]="item.color">
