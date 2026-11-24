@@ -50,7 +50,7 @@ export interface RegistroPasosPayload {
 })
 export class ArlekingApiService {
   private http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:5000/arleking';
+  private readonly baseUrl = 'mongodb+srv://25190843_db_user:PK6SWk9Qeda0MdUh@cluster0.kb42qf0.mongodb.net/';
 
   registrarUsuario(payload: SincronizarUsuarioPayload): Observable<RespuestaSyncUsuario> {
     return this.http.post<RespuestaSyncUsuario>(`${this.baseUrl}/users/register`, payload);
